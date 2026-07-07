@@ -17,12 +17,16 @@
     <title>Portfolio</title>
     <meta name="description" content="Personal portfolio site." />
     <meta name="author" content="" />
-    <link rel="canonical" href="/" />
+    <!--
+      Canonical + og:url are intentionally omitted from the static HTML.
+      Vite 7's build-html plugin tries to resolve href="/" as a local asset
+      and throws EISDIR because "/" is a directory. useSiteMeta() injects
+      the correct absolute URL from the CMS at runtime for JS-aware crawlers.
+    -->
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Portfolio" />
     <meta property="og:description" content="Personal portfolio site." />
-    <meta property="og:url" content="/" />
 
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Portfolio" />
