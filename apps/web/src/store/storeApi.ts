@@ -197,7 +197,7 @@ const __demoCatalog: ProductDto[] = [
     coverColor: '#60a5fa',
     tags: ['React', 'Vite', 'R3F', 'GSAP', 'Spring Boot'],
     fileSizeMb: 14, version: '1.0.0',
-    demoUrl: 'https://shivhari.dev',
+    demoUrl: 'https://shivhari.tech',
     repoUrl: null,
     features: ['Scroll-driven frame sequences', 'R3F 3D ambient scenes', 'Bento grid project showcase', 'Cart-ready store routes', 'Admin dashboard included', 'Spring Boot backend bundled'],
     whatYouGet: ['Complete React + Spring Boot source', 'Setup guide + deploy scripts', 'Free updates for 12 months'],

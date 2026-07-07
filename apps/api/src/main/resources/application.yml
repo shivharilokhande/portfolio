@@ -62,7 +62,7 @@ app:
     trusted-proxies:     ${TRUSTED_PROXIES:}
   contact:
     notify-to: ${CONTACT_NOTIFY_TO:shivlokhande7080@gmail.com}
-    from:      ${CONTACT_FROM:no-reply@shivhari.dev}
+    from:      ${CONTACT_FROM:no-reply@shivhari.tech}
     # Salt used when hashing submitter IPs for the SPAM heuristic. The source-
     # visible default is fine in dev but MUST be overridden in prod (the app
     # refuses to start otherwise) — otherwise a DB dump lets an attacker

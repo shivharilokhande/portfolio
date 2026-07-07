@@ -657,7 +657,7 @@ function ProfileEditor({ section, onSaved }: { section: Section; onSaved: () => 
     // admin, and login. Leave any of them blank and the site derives a
     // default from shortName.
     { key: 'brandPrefix', label: 'Brand — coloured half (e.g. shivhari)' },
-    { key: 'brandSuffix', label: 'Brand — muted half (e.g. .dev)' },
+    { key: 'brandSuffix', label: 'Brand — muted half (e.g. .tech, .dev, .com)' },
     { key: 'logoInitial', label: 'Brand — square badge letter (e.g. S)' },
     { key: 'linkedin',    label: 'LinkedIn URL' },
     { key: 'github',      label: 'GitHub URL' },

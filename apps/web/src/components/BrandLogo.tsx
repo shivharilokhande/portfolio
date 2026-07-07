@@ -5,7 +5,7 @@
  * entire site by editing three fields:
  *
  *   • profile.brandPrefix   → coloured half (e.g. "shivhari")
- *   • profile.brandSuffix   → muted half   (e.g. ".dev")
+ *   • profile.brandSuffix   → muted half   (e.g. ".tech" / ".dev" / ".com")
  *   • profile.logoInitial   → single-letter square badge (e.g. "S")
  *
  * If any field is blank we derive a sensible default from `shortName` so
@@ -20,7 +20,7 @@ export function useBrand() {
   const p = useSection<typeof staticProfile>('profile', staticProfile);
   const shortName = (p.shortName || p.name || 'Portfolio').toString();
   const brandPrefix = (p.brandPrefix?.trim() || shortName.toLowerCase().replace(/\s+/g, '')) as string;
-  const brandSuffix = (p.brandSuffix?.trim() || '.dev') as string;
+  const brandSuffix = (p.brandSuffix?.trim() || '.tech') as string;
   const logoInitial = (p.logoInitial?.trim() || shortName.charAt(0).toUpperCase()) as string;
   const fullBrand = `${brandPrefix}${brandSuffix}`;
   return { brandPrefix, brandSuffix, logoInitial, fullBrand, shortName, profile: p };

@@ -28,7 +28,7 @@ export const profile = {
   phone: '+91 95189 56711',
   cvUrl: '/Shivhari-Lokhande-CV.pdf',
   brandPrefix: 'shivhari',
-  brandSuffix: '.dev',
+  brandSuffix: '.tech',
   logoInitial: 'S',
   socials: {
     linkedin: 'https://www.linkedin.com/in/shivhari-lokhande/',

@@ -127,7 +127,7 @@ public class EmailService {
         // Runtime-resolved so admin can change the destination without restart.
         String notifyTo = settings.notifyToEmail();
         String from     = settings.fromEmail();
-        String subject = "[shivhari.dev] New contact from " + s.getName();
+        String subject = "[" + settings.siteTitle() + "] New contact from " + s.getName();
         String body = """
                 You received a new contact-form submission.
 
