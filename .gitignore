@@ -1,0 +1,83 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor / FS junk — belt-and-braces so a botched save doesn't sneak these
+# back into version control. Regenerated as needed by editors.
+*.bak
+*.swp
+*~
+.fuse_hidden*
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# Node
+node_modules/
+.vite/
+dist/
+
+# Maven / Java
+target/
+*.class
+*.jar
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+build/
+/nbproject/private/
+/nbbuild/
+/nbdist/
+/.nb-gradle/
+
+# Env
+.env
+.env.local
+.env.*.local
+# NB: .env.example is committed intentionally as a template for buyers.
+
+# H2 file databases (dev) — leftover data must never be committed.
+.data/
+apps/api/.data/
+
+# Old plugin/tool workspace that isn't part of the app.
+/src/
+
+# Claude Code / Cowork local settings — MAY contain API tokens.
+# Keep out of the repo. Rotate any credential ever committed here.
+.claude/
+
+# Logs
+*.log
+
+# Vendored source clones we never want committed alongside our own code.
+# The real `agent-browser` CLI is installed via npm (see package.json
+# devDependencies). Only keep the source clone locally for reference.
+/agent-browser/
+
+# Screenshots / traces produced by agent-browser smoke tests.
+.agent-browser/
+
+# Uploaded content — never commit binaries. Keep the folder shape (README
+# + .gitkeep files) so the tree is discoverable on a fresh clone.
+apps/api/.storage/**/*
+!apps/api/.storage/README.txt
+!apps/api/.storage/products/
+!apps/api/.storage/products/.gitkeep
+!apps/api/.storage/product-images/
+!apps/api/.storage/product-images/.gitkeep
+!apps/api/.storage/profile/
+!apps/api/.storage/profile/.gitkeep

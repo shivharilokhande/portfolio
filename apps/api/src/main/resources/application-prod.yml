@@ -1,0 +1,48 @@
+# Prod profile — managed MySQL, real mail, hardened logging.
+#
+# Required env vars in prod:
+#   DB_URL       — jdbc:mysql://host:3306/portfolio?useSSL=true&serverTimezone=UTC
+#   DB_USERNAME, DB_PASSWORD
+#   ALLOWED_ORIGINS — https://shivhari.dev
+#   APP_ADMIN_PASSWORD — strong password
+#   RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET (when wiring real payments)
+#   STRIPE_SECRET_KEY (optional)
+#   MAIL_PASSWORD (SendGrid API key)
+
+spring:
+  datasource:
+    url:      ${DB_URL:jdbc:mysql://localhost:3306/portfolio?useSSL=true&serverTimezone=UTC}
+    username: ${DB_USERNAME:portfolio}
+    password: ${DB_PASSWORD:portfolio}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size:  20
+      minimum-idle:       4
+      connection-timeout: 5000
+      max-lifetime:       1800000
+      pool-name:          portfolio-cp
+      data-source-properties:
+        cachePrepStmts:       true
+        prepStmtCacheSize:    250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts:   true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc.batch_size:    25
+        order_inserts:      true
+        order_updates:      true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+logging:
+  level:
+    com.personal.portfolio: INFO
+    org.springframework.web: WARN
+    org.hibernate.SQL: WARN

@@ -1,0 +1,118 @@
+# Base configuration — common to all profiles.
+# Profile-specific overrides live in application-{dev,prod,test}.yml
+
+spring:
+  application:
+    name: portfolio-api
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc.time_zone: UTC
+        format_sql: true
+  servlet:
+    multipart:
+      # Digital products ship as ZIPs — bump the limits.
+      max-file-size: 200MB
+      max-request-size: 220MB
+
+server:
+  port: ${PORT:9090}
+  compression:
+    enabled: true
+  error:
+    include-message: always
+    include-stacktrace: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics, prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+  health:
+    db:
+      enabled: true
+
+# Spring Cache (Caffeine) — used by the product catalog reads.
+spring.cache:
+  type: caffeine
+  cache-names: products, productBySlug, portfolioSections
+  caffeine:
+    spec: maximumSize=500,expireAfterWrite=120s
+
+app:
+  cors:
+    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+  rate-limit:
+    contact-per-hour: 5      # max contact submissions / hour / IP
+    api-per-minute: 300      # max generic GET / minute / IP — generous enough for
+                             # the CMS polling (list + N body reads every 15 s)
+                             # plus normal browsing traffic.
+    # X-Forwarded-For handling. Leave false by default so a client can't spoof
+    # its IP and evade the admin-login brute-force cap. When running behind a
+    # trusted proxy (Nginx, Caddy, Cloudflare Tunnel, etc.) set the env vars.
+    trust-forwarded-for: ${TRUST_FORWARDED_FOR:false}
+    trusted-proxies:     ${TRUSTED_PROXIES:}
+  contact:
+    notify-to: ${CONTACT_NOTIFY_TO:shivlokhande7080@gmail.com}
+    from:      ${CONTACT_FROM:no-reply@shivhari.dev}
+    # Salt used when hashing submitter IPs for the SPAM heuristic. The source-
+    # visible default is fine in dev but MUST be overridden in prod (the app
+    # refuses to start otherwise) — otherwise a DB dump lets an attacker
+    # rainbow-table IPv4 space in seconds.
+    ip-salt:   ${APP_CONTACT_IP_SALT:portfolio-salt}
+
+  # ----- Store payment gateways -----
+  # Leave keys blank to keep the stub providers active (no real charges).
+  # Drop real keys here (or via env vars) to switch into live mode.
+  payment:
+    razorpay:
+      key-id:     ${RAZORPAY_KEY_ID:}
+      key-secret: ${RAZORPAY_KEY_SECRET:}
+    stripe:
+      secret-key: ${STRIPE_SECRET_KEY:}
+      webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+
+  # ----- Admin dashboard credentials -----
+  # Sign in at /admin with these. Override via env vars for prod.
+  # WARNING: the password below ("123456") is a weak literal chosen for
+  # local development convenience. Set APP_ADMIN_PASSWORD to a strong
+  # random string before deploying anywhere reachable from the internet.
+  admin:
+    email:    ${APP_ADMIN_EMAIL:shivlokhande7080@gmail.com}
+    password: ${APP_ADMIN_PASSWORD:123456}
+
+  # ----- Asset storage -----
+  # Where uploaded product ZIPs, product demo images, and the admin CV PDF
+  # are written. Defaults to `apps/api/.storage/` inside the project so a
+  # fresh clone shows up immediately in the file tree — easy to browse,
+  # back up, and delete.
+  #
+  # In prod, set APP_STORAGE_DIR to a persistent volume path (e.g. an EBS
+  # mount, a bind-mounted Docker volume, or a shared NFS). Or swap the file
+  # writes in ProductAssetController / ProductImageController /
+  # ProfileAssetController for an S3 / R2 client — see the "TODO(prod)"
+  # comments in each file for the seams.
+  storage:
+    base-path: ${APP_STORAGE_DIR:./.storage}
+
+# Mail — uses Spring's standard mail starter. SendGrid SMTP relay works out of the box:
+#   host=smtp.sendgrid.net, port=587, username=apikey, password=<SENDGRID_API_KEY>
+spring.mail:
+  host:     ${MAIL_HOST:smtp.sendgrid.net}
+  port:     ${MAIL_PORT:587}
+  username: ${MAIL_USERNAME:apikey}
+  password: ${MAIL_PASSWORD:}
+  properties:
+    mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true

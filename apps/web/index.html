@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#f8f9ff" />
+
+    <!--
+      Default meta tags below are placeholders. The App root mounts a
+      `useSiteMeta()` hook that overwrites <title> / description /
+      canonical / OG / Twitter tags at runtime from the CMS Profile row.
+      Crawlers that execute JS see the CMS values; crawlers that don't
+      (rare, but e.g. some LinkedIn preview bots) see these defaults. Edit
+      them to match your primary deployment domain before launch.
+    -->
+    <title>Portfolio</title>
+    <meta name="description" content="Personal portfolio site." />
+    <meta name="author" content="" />
+    <link rel="canonical" href="/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Portfolio" />
+    <meta property="og:description" content="Personal portfolio site." />
+    <meta property="og:url" content="/" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Portfolio" />
+    <meta name="twitter:description" content="Personal portfolio site." />
+    <meta name="twitter:image" content="/og-image.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <!--
+      Structured data is intentionally omitted from index.html for template
+      distribution. If you want a Person schema, add your own JSON-LD block
+      here after edit — or attach it dynamically from useSiteMeta().
+    -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "",
+      "url": "/",
+      "sameAs": []
+    }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

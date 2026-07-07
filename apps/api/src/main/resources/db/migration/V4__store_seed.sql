@@ -1,0 +1,80 @@
+-- Seed products — same as the frontend demo catalog so the store has
+-- something to render the first time the API spins up.
+--
+-- features and what_you_get are pipe-separated ('|') so we can store a list
+-- in a single VARCHAR column. tags and tech_stack are comma-separated.
+
+INSERT INTO store_product
+(slug, title, tagline, description, category, price_inr, price_usd, cover_color, tags, features, what_you_get, tech_stack, file_size_mb, version, demo_url, repo_url, featured)
+VALUES
+('spring-boot-microservices-kit',
+ 'Spring Boot Microservices Starter Kit',
+ 'Production-grade Java 17 / Spring Boot 3 monorepo with auth, catalog, orders, payments — wired event-driven over SQS.',
+ 'Same architecture I shipped in production for EON Ecommerce. 12 services, observability baked in, Docker compose for local, Kubernetes manifests for prod. Hours of grunt-work, saved.',
+ 'Backend Kits',
+ 4999, 59, '#a855f7',
+ 'Java 17,Spring Boot 3,AWS,Kafka,Docker',
+ 'Twelve loosely-coupled services|Auth · catalog · cart · orders · payments|Event-driven over SQS|Postgres + Flyway migrations|Full Docker Compose for local dev|GitHub Actions CI/CD',
+ 'Complete source code (MIT)|Architecture decision records|Postman collection|Step-by-step setup guide|Free updates for 12 months',
+ 'Java 17,Spring Boot 3.3,PostgreSQL 16,Redis,AWS SQS,Docker,Kubernetes',
+ 28, '1.2.0', NULL, NULL, TRUE),
+
+('autoscalp-bot',
+ 'AutoScalp Trading Bot',
+ 'Algorithmic options-scalping engine for the Indian equity market with parameter sweep & walk-forward backtesting.',
+ 'Low-latency Java + WebSocket order routing. The same engine I run on my own capital. Bring your own broker credentials.',
+ 'Trading & Quant',
+ 14999, 199, '#fbbf24',
+ 'Java,Spring WebFlux,Trading,Redis,TimescaleDB',
+ 'Order routing under 20ms p99|Parameter-sweep backtesting harness|Walk-forward validation|Kite Connect broker adapter|Web UI with real-time P&L',
+ 'Complete source|Backtest data sample (3 mo)|Strategy presets|Setup video walkthrough|Discord access for 6 mo',
+ 'Java 17,Spring WebFlux,React,Redis,TimescaleDB',
+ 64, '2.5.0', NULL, NULL, TRUE),
+
+('cafe-pos',
+ 'Sugar & Spice Café POS',
+ 'POS + inventory + CRM automation built for my own café. Battle-tested in production.',
+ 'Tablet-friendly POS, automated inventory thresholds, lightweight customer CRM. Owner-operator product — not a SaaS, just the source code.',
+ 'Business Tools',
+ 9999, 129, '#10b981',
+ 'React,Node,PostgreSQL,POS',
+ 'Tablet-first POS UI|Inventory thresholds + reorder alerts|Customer CRM with notes|Daily/weekly reports|Offline-tolerant transactions',
+ 'Complete source code|Database seed for sample café|PDF receipt template|Setup guide|Email support 30 days',
+ 'React,Node 20,PostgreSQL,Tailwind',
+ 41, '1.0.4', NULL, NULL, TRUE),
+
+('photo-sorter-pro',
+ 'Wedding Photo Sorter Pro',
+ 'Face-recognition pipeline that groups thousands of wedding photos by guest, with a delightful gallery.',
+ 'Saved my family 40 hours sorting 10K photos. ONNX runtime, FastAPI backend, Next.js gallery. Privacy-first — runs fully local.',
+ 'AI & ML',
+ 2999, 39, '#ec4899',
+ 'Python,FastAPI,ONNX,Next.js',
+ 'Face detection + clustering|Guest grouping (drag-and-drop refine)|Next.js gallery with lightbox|Bulk download by guest|Privacy-first — runs fully local',
+ 'Complete source|Pre-trained ONNX model|Demo dataset (200 photos)|Setup guide',
+ 'Python 3.11,FastAPI,ONNX Runtime,Next.js 14',
+ 88, '1.1.0', NULL, NULL, TRUE),
+
+('shivhari-dev-template',
+ 'shivhari.dev — Cinematic Portfolio Template',
+ 'The exact portfolio you''re looking at, as a customizable template. R3F + Framer Motion + scroll-driven frames.',
+ 'Drop in your name, your projects, your frame sequence, your colours. Built to brand-customize in under 30 minutes.',
+ 'Templates',
+ 3999, 49, '#60a5fa',
+ 'React,Vite,R3F,TailwindCSS,Framer Motion',
+ 'Scroll-driven frame sequences|React Three Fiber 3D scenes|Bento grid project showcase|Dark/light theme tokens|Cart-ready store routes|Spring Boot backend included',
+ 'Complete React + Spring Boot source|Figma source files|Setup guide + deploy scripts|Free updates for 12 months',
+ 'React 18,Vite,TypeScript,Tailwind,R3F,Framer Motion,Spring Boot',
+ 12, '1.0.0', 'https://shivhari.dev', NULL, TRUE),
+
+('workiva-toolkit',
+ 'Workiva Integration Toolkit',
+ 'Reusable Java connectors for Salesforce ↔ Wdesk, audit trail, scheduled refresh.',
+ 'The connectors I built across four Fortune-500 Wdesk rollouts, packaged. SOX-friendly audit trail out of the box.',
+ 'Enterprise',
+ 19999, 249, '#38bdf8',
+ 'Workiva,Salesforce,Java,AWS Lambda',
+ 'Salesforce → Wdesk sync|Scheduled refresh via Lambda|Full audit trail (SOX-friendly)|Configurable column mapping|Connector unit-test fixtures',
+ 'Complete source|Workiva API client|Salesforce client|Setup videos|Email support 60 days',
+ 'Java 17,Spring Boot,AWS Lambda,Salesforce API,Workiva SDK',
+ 22, '3.0.1', NULL, NULL, FALSE);

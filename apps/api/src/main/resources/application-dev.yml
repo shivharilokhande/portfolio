@@ -1,0 +1,41 @@
+# Dev profile — file-backed H2 in MySQL-compatibility mode.
+#
+# Zero install: data lives in apps/api/.data/portfolio.mv.db (git-ignored).
+# Admin edits, orders, and contacts SURVIVE restarts.
+# To wipe and start fresh: rm -rf apps/api/.data
+#
+# For a real MySQL locally, activate the 'mysql' profile instead (see
+# application-mysql.yml). Prod uses the 'prod' profile (see application-prod.yml).
+#
+# No real email is sent in dev; ContactService logs the body instead.
+
+spring:
+  datasource:
+    url: jdbc:h2:file:./.data/portfolio;MODE=MySQL;DB_CLOSE_DELAY=-1;AUTO_SERVER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  h2:
+    console:
+      enabled: true
+      path: /h2
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show-sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    # Dev-only: don't reject startup when a checksum drifts. We edit migrations
+    # while iterating; in dev we just want pending migrations applied, not a
+    # full checksum re-validation of already-applied history. Prod (application-
+    # prod.yml) leaves validate-on-migrate at its default `true` for safety.
+    validate-on-migrate: false
+    out-of-order: true
+
+logging:
+  level:
+    com.personal.portfolio: DEBUG
+    org.springframework.web: INFO

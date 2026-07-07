@@ -1,0 +1,80 @@
+# Local full-stack: MySQL + Spring Boot API + Vite web.
+#
+#   docker compose up --build
+#
+# Or run only the DB:
+#
+#   docker compose up mysql -d
+#   (then run API + Web locally via `npm run dev` from project root)
+#
+# Frontend:  http://localhost:3000
+# API:       http://localhost:9090/api/health
+# MySQL:     localhost:3306  (portfolio / portfolio / portfolio)
+
+services:
+
+  mysql:
+    image: mysql:8.0
+    container_name: portfolio-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: portfolio_root
+      MYSQL_DATABASE: portfolio
+      MYSQL_USER: portfolio
+      MYSQL_PASSWORD: portfolio
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+00:00
+    ports:
+      - "3306:3306"
+    volumes:
+      - portfolio_mysql:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uportfolio", "-pportfolio"]
+      interval: 5s
+      timeout:  3s
+      retries:  20
+
+  api:
+    build:
+      context: ./apps/api
+    container_name: portfolio-api
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      PORT: "9090"
+      DB_URL:      "jdbc:mysql://mysql:3306/portfolio?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
+      DB_USERNAME: portfolio
+      DB_PASSWORD: portfolio
+      ALLOWED_ORIGINS:  "http://localhost:3000"
+      APP_ADMIN_EMAIL:  ${APP_ADMIN_EMAIL:-admin@shivhari.dev}
+      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD:-changeme}
+      CONTACT_NOTIFY_TO: ${CONTACT_NOTIFY_TO:-shivlokhande7080@gmail.com}
+      MAIL_PASSWORD:     ${SENDGRID_API_KEY:-}
+      APP_STORAGE_DIR:   "/var/shivhari-store"
+    volumes:
+      - portfolio_assets:/var/shivhari-store
+    ports:
+      - "9090:9090"
+
+  web:
+    image: node:20-alpine
+    container_name: portfolio-web
+    working_dir: /app
+    depends_on:
+      - api
+    environment:
+      VITE_API_URL: "http://localhost:9090"
+    volumes:
+      - ./apps/web:/app
+    command: sh -c "npm install --silent && npm run dev -- --host 0.0.0.0 --port 3000"
+    ports:
+      - "3000:3000"
+
+volumes:
+  portfolio_mysql:
+  portfolio_assets:

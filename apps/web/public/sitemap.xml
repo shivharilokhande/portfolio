@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  The live sitemap is served dynamically by the Spring Boot backend at
+  /sitemap.xml (see SitemapController.java). It uses the admin-configurable
+  `site.baseUrl` setting so buyers of the template don't have to hand-edit
+  a static file with their own domain.
+
+  This static file exists only as a fallback for setups that serve the SPA
+  from a CDN with no backend reachable at /sitemap.xml (e.g. a Vercel
+  preview with the API detached). If you deploy that way, replace this
+  file with your real sitemap.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>

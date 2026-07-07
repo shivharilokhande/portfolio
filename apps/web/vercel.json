@@ -1,0 +1,28 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "trailingSlash": false,
+
+  "// SPA fallback —": "every non-asset path falls back to index.html so React Router controls routing",
+  "rewrites": [
+    { "source": "/((?!assets/|videoframe/|videoframe2/|.*\\..*).*)", "destination": "/index.html" }
+  ],
+
+  "// Long cache for hashed Vite assets": "",
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
+    },
+    {
+      "source": "/index.html",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, must-revalidate" }
+      ]
+    }
+  ]
+}

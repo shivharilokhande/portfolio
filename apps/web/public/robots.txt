@@ -1,0 +1,7 @@
+# Robots policy — allow all crawlers. Sitemap is served dynamically by the
+# backend (SitemapController) and reflects whatever `site.baseUrl` is set to
+# in /admin/settings, so this file doesn't need to be edited per-deployment.
+User-agent: *
+Allow: /
+
+Sitemap: /sitemap.xml

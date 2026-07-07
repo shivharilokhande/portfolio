@@ -1,0 +1,28 @@
+{
+  "name": "shivhari-dev-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Run the React frontend (apps/web) and the Spring Boot API (apps/api) together with one command.",
+  "scripts": {
+    "install:all":  "cd apps/web && npm install",
+    "dev":          "concurrently --names \"API,WEB\" --prefix-colors \"blue.bold,green.bold\" --kill-others-on-fail \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api":      "cd apps/api && ./mvnw -q spring-boot:run",
+    "dev:web":      "cd apps/web && npm run dev",
+    "build":        "cd apps/web && npm run build && cd ../api && ./mvnw -q -DskipTests package",
+
+    "ab:install":   "agent-browser install",
+    "ab:open":      "agent-browser open http://localhost:3000",
+    "ab:snap":      "agent-browser snapshot",
+    "ab:close":     "agent-browser close --all",
+
+    "test:e2e:home":     "agent-browser open http://localhost:3000 && agent-browser screenshot .agent-browser/home.png --full",
+    "test:e2e:store":    "agent-browser open http://localhost:3000/store && agent-browser screenshot .agent-browser/store.png --full",
+    "test:e2e:contact":  "agent-browser open 'http://localhost:3000/#contact' && agent-browser screenshot .agent-browser/contact.png --full",
+    "test:e2e:admin":    "agent-browser open http://localhost:3000/admin/login && agent-browser screenshot .agent-browser/admin-login.png",
+    "test:e2e:all":      "mkdir -p .agent-browser && npm run test:e2e:home && npm run test:e2e:store && npm run test:e2e:contact && npm run test:e2e:admin && agent-browser close --all"
+  },
+  "devDependencies": {
+    "agent-browser": "^0.31.1",
+    "concurrently": "^9.0.1"
+  }
+}

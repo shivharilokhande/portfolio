@@ -1,0 +1,43 @@
+# Render Blueprint — provisions the API as a Web Service from this repo.
+# After you push the repo to GitHub, in Render dashboard:
+#   New + → Blueprint → connect repo → it reads this file → click Apply.
+#
+# All secrets are entered manually in the Render dashboard (sync: false).
+
+services:
+  - type: web
+    name: shivhari-api
+    runtime: java
+    plan: free
+    region: singapore                # closest to India; switch if Render adds Mumbai
+    branch: main
+    rootDir: apps/api
+    buildCommand: ./mvnw -DskipTests package
+    startCommand: java -jar target/portfolio-api-*.jar
+    healthCheckPath: /actuator/health
+    autoDeploy: true
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: PORT
+        value: 9090
+      - key: DB_URL
+        sync: false                  # TiDB Cloud JDBC URL — see DEPLOY_FREE.md
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false                  # e.g. https://shivhari-dev.vercel.app
+      - key: APP_ADMIN_EMAIL
+        sync: false
+      - key: APP_ADMIN_PASSWORD
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: APP_STORAGE_DIR
+        value: /tmp/shivhari-store   # ephemeral on free tier — see R2 section in DEPLOY_FREE.md

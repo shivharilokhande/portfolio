@@ -1,0 +1,366 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================================
+   shivhari.dev — "The Luminous Engine" design system
+   Light · editorial · tonal layering · green primary
+   ============================================================ */
+
+:root {
+  /* Surface hierarchy (cool whites stepping up in tone) */
+  --bg:                    248 249 255;   /* #f8f9ff  base */
+  --surface:               248 249 255;   /* alias of bg */
+  --surface-low:           239 244 255;   /* #eff4ff  Level 1 — sections */
+  --surface-container:     229 238 255;   /* #e5eeff  Level 2 — cards */
+  --surface-highest:       211 228 254;   /* #d3e4fe  Level 3 — floating */
+  --surface-lowest:        255 255 255;   /* pure white — lifted items */
+  --surface-bright:        255 255 255;   /* live-state highlight */
+
+  /* Ink */
+  --ink:                   11 28 48;      /* #0b1c30 on-surface */
+  --ink-soft:              42 64 96;      /* on-surface-variant */
+  --muted:                 95 113 138;    /* readable secondary */
+
+  /* Primary — Energy (green) */
+  --primary:               0 109 50;      /* #006d32 */
+  --primary-soft:          0 209 102;     /* #00d166 primary-container */
+  --on-primary:            255 255 255;
+  --primary-fixed:         162 245 196;   /* tint for status chips */
+  --on-primary-fixed:      0 47 21;
+
+  /* Secondary — Water (blue), used ONLY for water-style flows */
+  --secondary:             10 92 207;
+  --secondary-soft:        86 146 240;
+  --on-secondary:          255 255 255;
+
+  /* Outline — ghost only, used at 10-20% opacity */
+  --outline-variant:       187 203 185;   /* #bbcbb9 */
+
+  /* Status */
+  --error:                 186 26 26;
+  --error-container:       255 218 214;
+  --success:               0 109 50;      /* aligns with primary */
+  --warn:                  138 75 0;
+
+  /* Compatibility aliases — old tokens map onto new ones so legacy
+     Tailwind classes like bg-bg / text-ink / border-line still render. */
+  --brand:                 0 109 50;      /* primary green */
+  --brand2:                10 92 207;     /* water blue, used sparingly */
+  --accent:                0 209 102;     /* primary-soft */
+  --line:                  187 203 185;   /* outline-variant */
+  --shadow:                rgba(11, 28, 48, 0.06);
+}
+
+/* Reset dark scheme — Luminous Engine is light-mode. The .dark class
+   from the legacy theme is now an explicit no-op so any leftover toggle
+   doesn't break visuals. */
+.dark { color-scheme: light; }
+.dark :root, .dark { /* fall through to :root values */ }
+
+html { color-scheme: light; }
+html, body {
+  background: rgb(var(--bg));
+  color: rgb(var(--ink));
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  /* No dark gradients — the surface IS the background. */
+  background: rgb(var(--bg));
+}
+
+/* ============================================================
+   Typography — Inter (body) + Space Grotesk (display/numerals)
+   ============================================================ */
+
+/* Editorial display — pulls extreme contrast against body */
+.font-display { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; }
+.font-num     { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; font-feature-settings: 'tnum' 1; }
+.font-mono    { font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace; }
+
+.text-gradient {
+  background: linear-gradient(120deg, rgb(var(--primary)), rgb(var(--primary-soft)) 80%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ============================================================
+   Surface utilities — replace border-based separation
+   ============================================================ */
+
+.surface         { background: rgb(var(--surface)); }
+.surface-low     { background: rgb(var(--surface-low)); }
+.surface-c       { background: rgb(var(--surface-container)); }
+.surface-high    { background: rgb(var(--surface-highest)); }
+.surface-lowest  { background: rgb(var(--surface-lowest)); }
+
+/* Tonal nesting: every level deeper is one step up the hierarchy */
+.tier-1 { background: rgb(var(--surface-low));        border-radius: 24px; }
+.tier-2 { background: rgb(var(--surface-container));  border-radius: 24px; }
+.tier-3 { background: rgb(var(--surface-lowest));     border-radius: 24px; }
+
+/* Glass for *only* floating elements (header, modals, toasts) */
+.glass {
+  background: rgb(var(--surface) / 0.72);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+}
+.glass-strong {
+  background: rgb(var(--surface) / 0.88);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+}
+
+/* Ambient float — diffuse, never hard. Use ONLY on lifted surfaces. */
+.ambient-float {
+  box-shadow:
+    0 24px 40px -22px rgba(11, 28, 48, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+}
+.ambient-float-lg {
+  box-shadow:
+    0 40px 60px -30px rgba(11, 28, 48, 0.10),
+    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+}
+
+/* Ghost line — only when accessibility absolutely demands it */
+.ghost-line   { box-shadow: 0 0 0 1px rgb(var(--outline-variant) / 0.18); }
+.ghost-line-x { box-shadow: 0 -1px 0 rgb(var(--outline-variant) / 0.18) inset,
+                            0  1px 0 rgb(var(--outline-variant) / 0.18); }
+
+/* ============================================================
+   Button — primary uses the Energy gradient
+   ============================================================ */
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;                  /* the spec's DEFAULT 0.5rem */
+  background: linear-gradient(120deg, rgb(var(--primary)) 0%, rgb(var(--primary-soft)) 110%);
+  color: rgb(var(--on-primary));
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  transition: transform .18s ease, box-shadow .25s ease;
+  isolation: isolate;
+  position: relative;
+}
+.btn-primary::before {
+  content: '';
+  position: absolute; inset: -4px;
+  border-radius: inherit;
+  background: radial-gradient(closest-side, rgb(var(--primary-soft) / 0.45), transparent 70%);
+  opacity: 0; transition: opacity .25s ease;
+  z-index: -1;
+}
+.btn-primary:hover { transform: translateY(-1px); }
+.btn-primary:hover::before { opacity: 1; }
+
+.btn-tertiary {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.65rem 1rem;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: rgb(var(--primary));
+  font-weight: 600;
+  transition: background .18s ease;
+}
+.btn-tertiary:hover { background: rgb(var(--primary) / 0.06); }
+
+.btn-glow { /* legacy alias kept so old buttons still get the glow */
+  position: relative; isolation: isolate;
+  transition: transform .18s ease;
+}
+.btn-glow::before {
+  content: ''; position: absolute; inset: -4px; z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(closest-side, rgb(var(--primary-soft) / 0.4), transparent 70%);
+  opacity: 0; transition: opacity .25s ease;
+}
+.btn-glow:hover { transform: translateY(-1px); }
+.btn-glow:hover::before { opacity: 1; }
+
+/* ============================================================
+   Resource chip (rounded-full, ghost border)
+   ============================================================ */
+.chip-resource {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 9999px;
+  background: rgb(var(--surface-low));
+  color: rgb(var(--ink-soft));
+  font-size: 0.75rem;
+  font-weight: 500;
+  box-shadow: 0 0 0 1px rgb(var(--outline-variant) / 0.18);
+}
+.chip-status-active {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  background: rgb(var(--primary-fixed));
+  color: rgb(var(--on-primary-fixed));
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   Input — surface-container-low bg, ghost border, primary focus
+   ============================================================ */
+.input-clean {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: rgb(var(--surface-low));
+  color: rgb(var(--ink));
+  box-shadow: 0 0 0 1px rgb(var(--outline-variant) / 0.18);
+  transition: background .15s ease, box-shadow .15s ease;
+}
+.input-clean::placeholder { color: rgb(var(--muted) / 0.7); }
+.input-clean:focus {
+  outline: none;
+  background: rgb(var(--surface-lowest));
+  box-shadow: 0 0 0 2px rgb(var(--primary));
+}
+
+/* ============================================================
+   Live state highlight
+   ============================================================ */
+.is-live {
+  background: rgb(var(--surface-bright));
+  box-shadow: 0 0 0 1px rgb(var(--primary) / 0.25),
+              0 6px 18px -10px rgb(var(--primary) / 0.30);
+}
+.dot-live {
+  width: 0.55rem; height: 0.55rem; border-radius: 9999px;
+  background: rgb(var(--primary-soft));
+  box-shadow: 0 0 0 4px rgb(var(--primary-soft) / 0.18);
+  animation: pulse-live 2s ease-in-out infinite;
+}
+@keyframes pulse-live {
+  0%,100% { box-shadow: 0 0 0 4px rgb(var(--primary-soft) / 0.18); }
+  50%     { box-shadow: 0 0 0 8px rgb(var(--primary-soft) / 0.10); }
+}
+
+/* ============================================================
+   Scrollbar — match the surface palette
+   ============================================================ */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(rgb(var(--primary)), rgb(var(--primary-soft)));
+  border-radius: 9999px;
+}
+::selection { background: rgb(var(--primary-soft) / 0.35); color: rgb(var(--ink)); }
+
+/* ============================================================
+   Focus ring — primary, never blue
+   ============================================================ */
+:where(button, a, input, textarea, select):focus-visible {
+  outline: 2px solid rgb(var(--primary));
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* ============================================================
+   Reduced motion
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   Admin theme — light-only, Luminous Engine base + pastel KPI accents.
+   Scoped to .theme-soft (wraps every /admin/* route).
+   ============================================================ */
+.theme-soft { color-scheme: light; background: rgb(var(--bg)); }
+
+/* Status chips (used by AdminDashboardPage.statusChip) */
+.chip-mint     { background: #DFF4E9; color: #1F7A5A; }
+.chip-butter   { background: #FBEFCC; color: #8A5A14; }
+.chip-rose     { background: #FCE0EA; color: #A0264E; }
+.chip-lavender { background: #ECE3FD; color: #4E32B0; }
+.chip-sky      { background: #DEEDFC; color: #1C5B95; }
+.chip-peach    { background: #FFE7DA; color: #A14826; }
+.chip-slate    { background: #E6E9EE; color: #44546A; }
+
+/* Status pills for orders / contacts in admin (light-mode variants) */
+.pill-paid       { background: #DFF4E9; color: #1F7A5A; }
+.pill-pending    { background: #FBEFCC; color: #8A5A14; }
+.pill-cancelled  { background: #FCE0EA; color: #A0264E; }
+.pill-refunded   { background: #E6E9EE; color: #44546A; }
+.pill-new        { background: #ECE3FD; color: #4E32B0; }
+.pill-replied    { background: #DFF4E9; color: #1F7A5A; }
+.pill-archived   { background: #E6E9EE; color: #44546A; }
+.pill-spam       { background: #FCE0EA; color: #A0264E; }
+.pill            {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  font-size: 0.625rem; font-weight: 600;
+  padding: 0.2rem 0.55rem; border-radius: 9999px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+
+/* canvas containers */
+.canvas-host { position: absolute; inset: 0; z-index: 0; }
+
+/* shimmer skeleton */
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+.shimmer {
+  background: linear-gradient(90deg,
+    rgb(var(--surface-low)) 25%,
+    rgb(var(--surface-container)) 50%,
+    rgb(var(--surface-low)) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+/* Aurora blob — used very sparingly, soft green tint */
+.aurora {
+  position: absolute; inset: -30%;
+  filter: blur(80px);
+  z-index: 0; pointer-events: none;
+  opacity: .45;
+}
+
+/* Cinema canvas wrapper — frames are images, light page sits above them */
+.frame-canvas { display: block; image-rendering: -webkit-optimize-contrast; }
+.cinema-pin   { position: relative; width: 100%; height: 100vh; overflow: hidden; }
+
+/* Editorial display ramp — sharp scale jumps for "white space" hierarchy */
+.text-display-lg  { font-size: clamp(3.5rem, 9vw, 7rem);    line-height: 0.95; letter-spacing: -0.03em; }
+.text-display-md  { font-size: clamp(2.5rem, 6vw, 4.5rem);  line-height: 0.98; letter-spacing: -0.025em; }
+.text-headline-lg { font-size: clamp(2rem, 4.5vw, 3rem);    line-height: 1.05; letter-spacing: -0.02em; }
+.text-headline-md { font-size: clamp(1.5rem, 3vw, 2rem);    line-height: 1.15; letter-spacing: -0.015em; }
+.text-label-md    { font-size: 0.8125rem; letter-spacing: 0.10em; text-transform: uppercase; font-weight: 500; }
+.text-label-sm    { font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; }
+
+/* Legal page prose — long-form typography for ToS / Privacy / Refund */
+.prose-legal { color: rgb(var(--ink)); font-size: 0.95rem; line-height: 1.7; }
+.prose-legal h2 {
+  font-family: var(--font-display, 'Space Grotesk', ui-sans-serif, system-ui, sans-serif);
+  font-size: 1.5rem; letter-spacing: -0.015em;
+  margin: 2rem 0 0.75rem;
+  color: rgb(var(--ink));
+}
+.prose-legal h3 {
+  font-family: var(--font-display, 'Space Grotesk', ui-sans-serif, system-ui, sans-serif);
+  font-size: 1.125rem; letter-spacing: -0.01em;
+  margin: 1.5rem 0 0.5rem;
+  color: rgb(var(--ink));
+}
+.prose-legal p     { margin: 0.75rem 0; color: rgb(var(--ink-soft)); }
+.prose-legal ul    { margin: 0.5rem 0 1rem 0; padding-left: 1.25rem; list-style: disc; color: rgb(var(--ink-soft)); }
+.prose-legal li    { margin: 0.25rem 0; }
+.prose-legal strong{ color: rgb(var(--ink)); font-weight: 600; }
+.prose-legal a     { color: rgb(var(--primary)); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+.prose-legal a:hover { text-decoration-thickness: 2px; }
+.prose-legal > *:first-child { margin-top: 0; }

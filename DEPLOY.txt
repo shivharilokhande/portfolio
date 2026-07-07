@@ -1,0 +1,207 @@
+╔══════════════════════════════════════════════════════════════════╗
+║                   Portfolio — Production Deploy                   ║
+╚══════════════════════════════════════════════════════════════════╝
+
+Three deploy paths, pick the one you're most comfortable with.
+
+────────────────────────────────────────────────────────────────────
+OPTION A · Self-hosted VPS (Docker Compose) — RECOMMENDED
+────────────────────────────────────────────────────────────────────
+
+You need: any Linux box (2 vCPU / 2 GB RAM works fine) with Docker
+and a domain pointing at its IP.
+
+1.  Clone the repo onto the box.
+      git clone <your-repo-url> portfolio
+      cd portfolio
+
+2.  Create .env.local from the template and fill in EVERY required
+    field. The `${VAR:?…}` lines in docker-compose.prod.yml refuse
+    to start if any are missing.
+      cp .env.example .env.local
+      $EDITOR .env.local
+
+    Bare-minimum values you MUST set:
+      SPRING_PROFILES_ACTIVE=prod
+      APP_ADMIN_EMAIL=you@example.com
+      APP_ADMIN_PASSWORD=<32+ random chars>
+      APP_CONTACT_IP_SALT=<32+ random chars>
+      SITE_BASE_URL=https://your-domain.com
+      DB_PASSWORD=<strong>
+      DB_ROOT_PASSWORD=<strong>
+
+    Generate strong secrets with:
+      openssl rand -hex 32
+
+3.  Bring the stack up.
+      docker compose -f docker-compose.prod.yml --env-file .env.local up -d
+
+    First run:
+      • pulls MySQL 8 + Node/nginx images (~ 90 s)
+      • builds the API image (~ 3-5 min on a small box)
+      • builds the web image (~ 90 s)
+      • boots MySQL, waits for health, then boots api, then web
+
+4.  Verify health.
+      docker compose -f docker-compose.prod.yml ps
+      # all three services should show `healthy` or `Up`
+
+      curl -f http://localhost/actuator/health
+      # {"status":"UP"}
+
+5.  Put HTTPS in front. Simplest is Caddy on the host:
+      # /etc/caddy/Caddyfile
+      your-domain.com {
+        reverse_proxy localhost:80
+      }
+      sudo systemctl reload caddy
+
+    Or Cloudflare Tunnel — no ports exposed at all.
+
+6.  Sign in at https://your-domain.com/admin/login with the email +
+    password from step 2. Paste the Razorpay + Stripe keys into
+    /admin/settings → Payment. Uncheck testMode when ready.
+
+7.  Configure the payment webhooks (in each provider's dashboard):
+      Razorpay:  URL  https://your-domain.com/api/store/webhooks/razorpay
+                 Event  payment.captured
+                 Secret paste into /admin/settings → Razorpay webhook secret
+      Stripe:    URL  https://your-domain.com/api/store/webhooks/stripe
+                 Event  checkout.session.completed
+                 Secret whsec_… printed on the endpoint page →
+                        /admin/settings → Stripe webhook secret
+
+────────────────────────────────────────────────────────────────────
+OPTION B · Railway / Render / Fly.io (managed)
+────────────────────────────────────────────────────────────────────
+
+Split into two services:
+
+  Backend  → Railway or Fly.io (needs persistent volume + MySQL addon)
+  Frontend → Vercel or Netlify (static Vite build)
+
+Railway walkthrough (fastest):
+
+1.  Create a Railway project.
+2.  New service → GitHub → point at this repo → root dir `apps/api`.
+    Railway detects the Dockerfile and builds it automatically.
+3.  Add MySQL plugin from Railway's marketplace. Copy the connection
+    string into the api service's variables as DB_URL, DB_USER,
+    DB_PASSWORD.
+4.  Add a persistent volume mounted at /var/portfolio/storage.
+5.  Set every other env var from .env.example on the api service
+    (SPRING_PROFILES_ACTIVE=prod, APP_ADMIN_*, APP_CONTACT_IP_SALT,
+    SITE_BASE_URL, ALLOWED_ORIGINS, …).
+6.  Frontend: create a Vercel project, root dir `apps/web`, build
+    command `npm run build`, output dir `dist`. Add env var
+    VITE_API_URL=https://<your-railway-api-url>.
+7.  Point your domain at Vercel; Vercel handles TLS.
+8.  Configure Razorpay + Stripe webhooks (see Option A step 7 —
+    the URL is now https://your-domain.com/api/store/webhooks/…
+    which Vercel proxies to Railway).
+
+Fly.io + Vercel is the same shape — use `fly launch` from `apps/api`
+and configure a volume + secrets.
+
+────────────────────────────────────────────────────────────────────
+OPTION C · Vercel (frontend only, no store)
+────────────────────────────────────────────────────────────────────
+
+If you just want the portfolio site itself (no store, no CMS, no
+admin, no orders) you can skip the backend entirely. The frontend
+falls back to `apps/web/src/lib/data.ts` + `copyDefaults.ts` when
+no API is reachable — every section still renders.
+
+    cd apps/web
+    npm run build
+    npx vercel --prod
+
+Missing when there's no API: the store, admin panel, contact form
+submission (form shows an error), CV upload, order downloads.
+
+────────────────────────────────────────────────────────────────────
+POST-DEPLOY VERIFICATION CHECKLIST
+────────────────────────────────────────────────────────────────────
+
+Before you accept the first real payment, verify each of these:
+
+[ ] curl -f https://your-domain.com/actuator/health returns UP
+[ ] Home page loads with the right brand + your content
+[ ] /admin/login accepts your credentials
+[ ] /admin/portfolio saves an edit and the public site reflects it
+[ ] Upload a CV — the Download CV button appears on the home page
+    and the downloaded file is called {YourName}-cv.pdf
+[ ] Upload a product ZIP + demo images in /admin/products
+[ ] Place a TEST order with Razorpay's test keys (any 4111 1111 1111 1111
+    card) → webhook arrives → order shows PAID in /admin/orders →
+    buyer email lands with a working download link
+[ ] Place a TEST order with Stripe's test keys → same verifications
+[ ] Hit the download URL 21 times in an hour → the 21st returns
+    HTTP 429 (per-token quota)
+[ ] Wait 61 minutes, hit again → back to 200
+[ ] Test the contact form — email lands in the notify-to inbox
+[ ] Site loads under HTTPS with a green padlock
+[ ] Google Search Console: submit https://your-domain.com/sitemap.xml
+[ ] Set up daily backup of the storage volume:
+      # add to crontab
+      0 4 * * *  docker run --rm -v portfolio_storage:/data \
+                   -v /backup:/backup alpine \
+                   tar -czf /backup/storage-$(date +\%F).tar.gz -C /data .
+
+────────────────────────────────────────────────────────────────────
+ROLLBACK
+────────────────────────────────────────────────────────────────────
+
+Docker Compose:
+    docker compose -f docker-compose.prod.yml down     # stops everything
+    docker compose -f docker-compose.prod.yml up -d    # brings it back
+
+Volumes (portfolio_db, portfolio_storage) are preserved across down/up.
+
+To wipe and start over (DELETES ALL DATA):
+    docker compose -f docker-compose.prod.yml down -v
+
+────────────────────────────────────────────────────────────────────
+COMMON ISSUES
+────────────────────────────────────────────────────────────────────
+
+• "refusing to start with weak default admin password"
+    You left APP_ADMIN_PASSWORD blank or set to changeme/123456/etc.
+    Regenerate: openssl rand -hex 24, set in .env.local, restart.
+
+• "refusing to start with default contact ip-salt in prod"
+    Set APP_CONTACT_IP_SALT to a random string, restart.
+
+• Flyway "failed migration" errors on boot
+    Only happens if a previous migration errored. Fix path in dev:
+      rm -rf apps/api/.data && npm run dev
+    In prod under Docker:
+      docker compose exec db mysql -u root -p<pw>
+      DROP DATABASE portfolio; CREATE DATABASE portfolio;
+      docker compose restart api
+
+• Payment webhooks not arriving
+    Check the gateway's webhook logs. Common causes: wrong URL (must
+    be https, not http), wrong secret, or your firewall blocking
+    inbound POSTs from the gateway's IP range. Test with:
+      curl -X POST https://your-domain.com/api/store/webhooks/stripe
+      # → 400 or 401 (missing signature) means it's reachable.
+
+• "public link points elsewhere" on CV admin card
+    Delete the CV from the admin uploader, then re-upload. The uploader
+    resets profile.cvUrl to /api/profile/cv?v=<timestamp>.
+
+────────────────────────────────────────────────────────────────────
+SECRETS TO ROTATE PERIODICALLY
+────────────────────────────────────────────────────────────────────
+
+Every 90 days:
+  APP_ADMIN_PASSWORD
+  DB_PASSWORD
+  MAIL_PASSWORD (SendGrid API key)
+
+Every 12 months:
+  APP_CONTACT_IP_SALT (rotating this invalidates old ipHash rows —
+                       acceptable, they're audit data)
+  Razorpay / Stripe keys (rotate in dashboard, update in
+                          /admin/settings, no restart needed)
