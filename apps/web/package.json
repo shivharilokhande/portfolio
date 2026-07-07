@@ -6,7 +6,7 @@
   "description": "Cinematic Portfolio Template — 3D animated single-page portfolio with a store, CMS, and admin panel. Rebrand from /admin/portfolio.",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "type-check": "tsc --noEmit"
