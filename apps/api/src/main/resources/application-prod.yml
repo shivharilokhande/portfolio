@@ -52,6 +52,20 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
+# Health indicators — override Spring Boot's default composite so /actuator/health
+# reports UP as long as the DB is reachable. Without these overrides, mail (which
+# is intentionally unconfigured on first boot) reports DOWN and pulls the whole
+# composite DOWN, which Render then treats as an unhealthy service.
+management:
+  health:
+    mail:
+      enabled: false   # no SMTP creds until Brevo is wired via env vars
+    ssl:
+      enabled: false   # avoid SslHealthIndicator noise on containers without cert bundles
+  endpoint:
+    health:
+      show-details: always   # expose which indicators are UP/DOWN — health data is not sensitive
+
 logging:
   level:
     com.personal.portfolio: INFO
