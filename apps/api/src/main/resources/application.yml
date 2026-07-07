@@ -19,12 +19,19 @@ spring:
       max-request-size: 220MB
 
 server:
+  # Cloud Run injects PORT=8080. The 9090 default is only used for local
+  # dev. Keep this in sync with the Dockerfile's ENV PORT + EXPOSE.
   port: ${PORT:9090}
   compression:
     enabled: true
   error:
     include-message: always
     include-stacktrace: never
+  # Cloud Run + Cloudflare terminate TLS upstream and forward the real
+  # client info via X-Forwarded-* headers. Trust them so request.remoteAddr
+  # reflects the actual client (essential for the contact-form rate limiter).
+  # Pair with TRUST_FORWARDED_FOR=true in prod.
+  forward-headers-strategy: framework
 
 management:
   endpoints:

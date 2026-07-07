@@ -1,13 +1,20 @@
-# Prod profile — managed MySQL, real mail, hardened logging.
+# Prod profile — TiDB Serverless (MySQL 8.0-wire-compatible) on Google Cloud Run.
 #
-# Required env vars in prod:
-#   DB_URL       — jdbc:mysql://host:3306/portfolio?useSSL=true&serverTimezone=UTC
-#   DB_USERNAME, DB_PASSWORD
-#   ALLOWED_ORIGINS — https://shivhari.dev
-#   APP_ADMIN_PASSWORD — strong password
-#   RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET (when wiring real payments)
-#   STRIPE_SECRET_KEY (optional)
-#   MAIL_PASSWORD (SendGrid API key)
+# Required env vars in prod (set via `gcloud run services update --set-env-vars`):
+#   DB_URL       — jdbc:mysql://<host>:4000/<db>?useSSL=true&requireSSL=true&serverTimezone=UTC&enabledTLSProtocols=TLSv1.2,TLSv1.3
+#                  (TiDB Serverless listens on port 4000 and REQUIRES TLS)
+#   DB_USERNAME, DB_PASSWORD    — from TiDB Cloud dashboard
+#   ALLOWED_ORIGINS             — https://shivhari.tech,https://www.shivhari.tech
+#   APP_ADMIN_PASSWORD          — strong random password
+#   APP_CONTACT_IP_SALT         — random 32+ char string
+#   RAZORPAY_KEY_ID / RAZORPAY_KEY_SECRET
+#   RAZORPAY_WEBHOOK_SECRET
+#   STRIPE_SECRET_KEY / STRIPE_WEBHOOK_SECRET (optional)
+#   MAIL_HOST=smtp-relay.brevo.com, MAIL_PORT=587, MAIL_USERNAME, MAIL_PASSWORD
+#   SITE_BASE_URL               — https://shivhari.tech
+#   TRUST_FORWARDED_FOR=true    — Cloud Run + Cloudflare terminate TLS upstream
+#
+# Cloud Run injects PORT=8080; Spring picks it up via server.port in application.yml.
 
 spring:
   datasource:
@@ -16,10 +23,14 @@ spring:
     password: ${DB_PASSWORD:portfolio}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
-      maximum-pool-size:  20
-      minimum-idle:       4
-      connection-timeout: 5000
-      max-lifetime:       1800000
+      # TiDB Serverless free tier caps concurrent connections to a small
+      # number, and Cloud Run scales to zero — a fat pool is wasteful. Keep
+      # it lean so cold starts don't stampede the DB.
+      maximum-pool-size:  5
+      minimum-idle:       1
+      connection-timeout: 10000
+      idle-timeout:       300000
+      max-lifetime:       900000
       pool-name:          portfolio-cp
       data-source-properties:
         cachePrepStmts:       true
