@@ -10,24 +10,49 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.time.ZoneId;
+import java.util.List;
 
 /**
- * Sends the notification email when a contact submission lands.
+ * Sends the notification email when a contact submission lands OR when a
+ * store order transitions to PAID.
  *
- * <p>Resilient by design — if mail isn't configured (dev mode, no SMTP password),
- * we log the body at INFO instead of throwing. The contact endpoint will still
- * persist the submission, so leads are never lost.
+ * <p>Delivery path is chosen at construction time based on env vars:
+ *
+ * <ol>
+ *   <li>If {@code BREVO_API_KEY} is set → send via Brevo's transactional
+ *       HTTPS API (POST https://api.brevo.com/v3/smtp/email). This is the
+ *       only path that works on hosts that block outbound SMTP — notably
+ *       Render Free and most PaaS providers.</li>
+ *   <li>Else if {@code MAIL_PASSWORD} is set → send via SMTP through
+ *       Spring's JavaMailSender. Works on hosts that allow outbound
+ *       SMTP (Render Starter+, most VPSes).</li>
+ *   <li>Else → log the body at INFO and return. The contact endpoint
+ *       still persists the submission, so leads are never lost.</li>
+ * </ol>
+ *
+ * <p>All send failures are caught and logged at WARN — this class never
+ * throws back to the caller, so an email outage never blocks the
+ * request path.
  */
 @Service
 public class EmailService {
 
     private static final Logger log = LoggerFactory.getLogger(EmailService.class);
+    private static final String BREVO_URL = "https://api.brevo.com/v3/smtp/email";
 
     private final JavaMailSender mailSender;
     private final AppSettings settings;
-    private final boolean mailEnabled;
+    private final boolean smtpEnabled;
+    private final String brevoApiKey;
+    private final boolean brevoEnabled;
+    private final HttpClient http;
     /** Absolute base URL used to build the download link in confirmation emails.
      *  Falls back to the site.baseUrl admin setting, then a localhost default. */
     private final String siteBase;
@@ -36,11 +61,28 @@ public class EmailService {
             JavaMailSender mailSender,
             AppSettings settings,
             @Value("${spring.mail.password:}") String mailPassword,
+            @Value("${BREVO_API_KEY:}") String brevoApiKey,
             @Value("${SITE_BASE_URL:http://localhost:3000}") String siteBase) {
-        this.mailSender = mailSender;
-        this.settings   = settings;
-        this.mailEnabled = mailPassword != null && !mailPassword.isBlank();
-        this.siteBase   = siteBase;
+        this.mailSender   = mailSender;
+        this.settings     = settings;
+        this.smtpEnabled  = mailPassword != null && !mailPassword.isBlank();
+        this.brevoApiKey  = brevoApiKey != null ? brevoApiKey.trim() : "";
+        this.brevoEnabled = !this.brevoApiKey.isEmpty();
+        this.siteBase     = siteBase;
+        // Reasonable timeouts — Brevo API responds in ~200ms typically, but
+        // give it 10s headroom. Container startup on Render Free is slow and
+        // we don't want the first request to bleed into cold-start territory.
+        this.http = HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(5))
+                .build();
+
+        if (brevoEnabled) {
+            log.info("EmailService: using Brevo HTTP API");
+        } else if (smtpEnabled) {
+            log.info("EmailService: using SMTP (JavaMailSender)");
+        } else {
+            log.info("EmailService: no email provider configured — sends will be logged only");
+        }
     }
 
     /** Prefer the admin-editable site.baseUrl over the env default. */
@@ -99,27 +141,16 @@ public class EmailService {
                 expiry,
                 settings.siteTitle());
 
-        String notifyTo = order.getEmail();
-        String from     = settings.fromEmail();
+        String from    = settings.fromEmail();
+        String owner   = settings.notifyToEmail();
+        List<String> bcc = (owner != null && !owner.isBlank()) ? List.of(owner) : List.of();
 
-        if (!mailEnabled) {
-            log.info("[mail-disabled] {} → {} :: {}", subject, notifyTo, body);
-            return;
-        }
-        SimpleMailMessage msg = new SimpleMailMessage();
-        if (from != null && !from.isBlank()) msg.setFrom(from);
-        msg.setTo(notifyTo);
-        msg.setSubject(subject);
-        msg.setText(body);
-        // BCC the site owner so they get a copy without appearing in the
-        // buyer's header (helpful for reconciliation + support).
-        String ownerCopy = settings.notifyToEmail();
-        if (ownerCopy != null && !ownerCopy.isBlank()) msg.setBcc(ownerCopy);
-        try {
-            mailSender.send(msg);
-            log.info("Sent order confirmation to {} for order #{}", notifyTo, order.getId());
-        } catch (Exception ex) {
-            log.warn("Order confirmation email failed for order #{}: {}", order.getId(), ex.getMessage());
+        Msg msg = new Msg(from, order.getEmail(), subject, body, null, bcc, settings.siteTitle());
+        boolean ok = dispatch(msg);
+        if (ok) {
+            log.info("Sent order confirmation to {} for order #{}", order.getEmail(), order.getId());
+        } else {
+            log.warn("Order confirmation email failed for order #{} — DB row still marked PAID", order.getId());
         }
     }
 
@@ -149,23 +180,140 @@ public class EmailService {
                 s.getMessage(),
                 s.getId() == null ? -1 : s.getId());
 
-        if (!mailEnabled || notifyTo == null || notifyTo.isBlank()) {
-            log.info("[mail-disabled] {} :: {}", subject, body);
+        if (notifyTo == null || notifyTo.isBlank()) {
+            log.info("[mail-no-destination] {} :: {}", subject, body);
             return;
         }
 
-        SimpleMailMessage msg = new SimpleMailMessage();
-        if (from != null && !from.isBlank()) msg.setFrom(from);
-        msg.setReplyTo(s.getEmail());
-        msg.setTo(notifyTo);
-        msg.setSubject(subject);
-        msg.setText(body);
-        try {
-            mailSender.send(msg);
+        Msg msg = new Msg(from, notifyTo, subject, body, s.getEmail(), List.of(), settings.siteTitle());
+        boolean ok = dispatch(msg);
+        if (ok) {
             log.info("Sent contact notification (submission #{})", s.getId());
-        } catch (Exception ex) {
-            log.warn("Failed to send mail for submission #{} — keeping the row in DB: {}",
-                    s.getId(), ex.getMessage());
+        } else {
+            log.warn("Failed to send mail for submission #{} — keeping the row in DB", s.getId());
         }
     }
+
+    /** Route a message through the first available provider. Never throws. */
+    private boolean dispatch(Msg m) {
+        if (brevoEnabled) {
+            return sendViaBrevo(m);
+        }
+        if (smtpEnabled) {
+            return sendViaSmtp(m);
+        }
+        // No provider — log the body so leads are visible in server logs.
+        log.info("[mail-disabled] {} → {} :: {}", m.subject, m.to, m.text);
+        return false;
+    }
+
+    /**
+     * POSTs to https://api.brevo.com/v3/smtp/email with a hand-rolled JSON
+     * body. We keep dependencies minimal (no Jackson call needed — the JSON
+     * shape is small and stable). Escapes strings for JSON safety.
+     */
+    private boolean sendViaBrevo(Msg m) {
+        // Sender: use configured from-address; if it's blank, fall back to a
+        // hard-coded no-reply. The address MUST be verified in Brevo or the
+        // API returns 400 with "unverified sender".
+        String senderEmail = (m.from != null && !m.from.isBlank()) ? m.from : "no-reply@example.com";
+        String senderName  = m.senderName != null ? m.senderName : "shivhari.tech";
+
+        StringBuilder bccJson = new StringBuilder();
+        for (int i = 0; i < m.bcc.size(); i++) {
+            if (i > 0) bccJson.append(",");
+            bccJson.append("{\"email\":\"").append(esc(m.bcc.get(i))).append("\"}");
+        }
+        String replyToJson = (m.replyTo != null && !m.replyTo.isBlank())
+                ? ",\"replyTo\":{\"email\":\"" + esc(m.replyTo) + "\"}"
+                : "";
+        String bccBlock = !m.bcc.isEmpty()
+                ? ",\"bcc\":[" + bccJson + "]"
+                : "";
+
+        String json = "{"
+                + "\"sender\":{\"email\":\"" + esc(senderEmail) + "\",\"name\":\"" + esc(senderName) + "\"},"
+                + "\"to\":[{\"email\":\"" + esc(m.to) + "\"}],"
+                + "\"subject\":\"" + esc(m.subject) + "\","
+                + "\"textContent\":\"" + esc(m.text) + "\""
+                + replyToJson
+                + bccBlock
+                + "}";
+
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(BREVO_URL))
+                    .timeout(Duration.ofSeconds(15))
+                    .header("api-key", brevoApiKey)
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+
+            HttpResponse<String> response = http.send(request, HttpResponse.BodyHandlers.ofString());
+            int code = response.statusCode();
+            if (code >= 200 && code < 300) {
+                return true;
+            }
+            // Brevo returns JSON like {"code":"unauthorized","message":"Key not found"}.
+            // Log the response body so we can debug quickly.
+            log.warn("Brevo API returned {}: {}", code, response.body());
+            return false;
+        } catch (Exception ex) {
+            log.warn("Brevo API call failed: {}", ex.getMessage());
+            return false;
+        }
+    }
+
+    /** Legacy SMTP path. Kept for hosts that allow outbound SMTP. */
+    private boolean sendViaSmtp(Msg m) {
+        try {
+            SimpleMailMessage msg = new SimpleMailMessage();
+            if (m.from != null && !m.from.isBlank()) msg.setFrom(m.from);
+            if (m.replyTo != null && !m.replyTo.isBlank()) msg.setReplyTo(m.replyTo);
+            msg.setTo(m.to);
+            msg.setSubject(m.subject);
+            msg.setText(m.text);
+            if (!m.bcc.isEmpty()) msg.setBcc(m.bcc.toArray(new String[0]));
+            mailSender.send(msg);
+            return true;
+        } catch (Exception ex) {
+            log.warn("SMTP send failed: {}", ex.getMessage());
+            return false;
+        }
+    }
+
+    /** Minimal JSON string escaper — handles quotes, backslashes, newlines. */
+    private static String esc(String s) {
+        if (s == null) return "";
+        StringBuilder out = new StringBuilder(s.length() + 8);
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            switch (c) {
+                case '"'  -> out.append("\\\"");
+                case '\\' -> out.append("\\\\");
+                case '\n' -> out.append("\\n");
+                case '\r' -> out.append("\\r");
+                case '\t' -> out.append("\\t");
+                default   -> {
+                    if (c < 0x20) {
+                        out.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        out.append(c);
+                    }
+                }
+            }
+        }
+        return out.toString();
+    }
+
+    /** Internal message DTO — captures both providers' needs. */
+    private record Msg(
+            String from,
+            String to,
+            String subject,
+            String text,
+            String replyTo,
+            List<String> bcc,
+            String senderName) {}
 }
