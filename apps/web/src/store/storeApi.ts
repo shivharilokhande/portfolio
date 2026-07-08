@@ -54,7 +54,7 @@ export type OrderRequest = {
   name:           string;
   items:          { productId: number; quantity: number }[];
   currency:       'INR' | 'USD';
-  paymentMethod:  'razorpay' | 'stripe' | 'mock';
+  paymentMethod:  'razorpay' | 'stripe';
   couponCode?:    string;
 };
 

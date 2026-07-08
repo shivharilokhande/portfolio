@@ -166,7 +166,7 @@ export const copyDefaults: CopyDoc = {
   footer: {
     creditsEyebrow:     'END · CREDITS',
     creditsTitle:       'Built end to end by {name}',
-    creditsBody:        'React Three Fiber, Framer Motion, GSAP ScrollTrigger over a Spring Boot + MySQL backend. Designed and shipped as a single editorial experience.',
+    creditsBody:        'Every layer here — the 3D landing, the Spring Boot API, the store, the admin CMS, the deploy pipeline — designed and built end-to-end by me. Not a hire, not a template. This is what one senior can ship when the whole stack is familiar.',
     contactCardEyebrow: 'Ready for the next one',
     contactCardTitle:   'Want a similar build?',
     contactCardBody:    'Freelance & fractional CTO engagements open. Six-week pilot or three-month retainer.',

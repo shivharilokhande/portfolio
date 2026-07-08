@@ -8,7 +8,7 @@ import com.personal.portfolio.cms.PortfolioContentRepository;
 import com.personal.portfolio.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -127,20 +127,44 @@ public class ProfileAssetController {
     /* ---------- Public ---------- */
 
     /**
-     * Public CV download. Streams from storage with a friendly filename.
-     * The file is small (≤10 MB) so hopping through Spring is fine — this
-     * lets us set {@code Content-Disposition} cleanly regardless of what
-     * the storage backend sets on the underlying object, and avoids
-     * leaking the raw R2 URL in the browser's Network tab.
+     * Public CV download. Buffers the object into memory then returns a
+     * {@link ByteArrayResource} with an explicit {@code Content-Length}.
+     *
+     * <p>Why we don't stream: an earlier version used
+     * {@code InputStreamResource} which does not advertise a length. Spring
+     * then falls back to chunked transfer encoding, and any intermediary
+     * that re-encodes {@code application/pdf} (Cloudflare's fetch layer,
+     * some proxies with auto-gzip) can produce a truncated / mis-encoded
+     * PDF that browsers open as a blank page or "damaged file". Loading
+     * the whole CV upfront costs a few MB of heap for one request but
+     * eliminates the corruption class entirely — CV is capped at 10 MB.
      */
     @GetMapping("/api/profile/cv")
     public ResponseEntity<?> download() throws IOException {
-        if (!storage.exists(CV_OBJECT_KEY)) return ResponseEntity.notFound().build();
+        long size = storage.size(CV_OBJECT_KEY);
+        if (size < 0) return ResponseEntity.notFound().build();
+
+        byte[] bytes;
+        try (var in = storage.openStream(CV_OBJECT_KEY)) {
+            bytes = in.readAllBytes();
+        }
+        // If R2 returned a truncated response, size won't match. Refuse
+        // rather than serve a broken PDF.
+        if (bytes.length != size) {
+            log.warn("CV size mismatch — declared {} bytes, got {}. Refusing to serve.",
+                    size, bytes.length);
+            return ResponseEntity.status(502).body("Storage returned an incomplete file. Please retry.");
+        }
+
         HttpHeaders h = new HttpHeaders();
         h.setContentType(MediaType.APPLICATION_PDF);
         h.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"cv.pdf\"");
+        // Explicit Content-Length + identity encoding blocks intermediaries
+        // from silently re-compressing the PDF (which corrupts it).
+        h.setContentLength(bytes.length);
+        h.set(HttpHeaders.CONTENT_ENCODING, "identity");
         h.setCacheControl("no-cache");
-        return ResponseEntity.ok().headers(h).body(new InputStreamResource(storage.openStream(CV_OBJECT_KEY)));
+        return ResponseEntity.ok().headers(h).body(new ByteArrayResource(bytes));
     }
 
     /* ---------- Helpers ---------- */

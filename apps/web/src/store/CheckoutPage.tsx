@@ -70,7 +70,7 @@ import { motion } from 'framer-motion';
 import { useCart, formatMoney } from './cartStore';
 import { store } from './storeApi';
 
-type PayMethod = 'razorpay' | 'stripe' | 'mock';
+type PayMethod = 'razorpay' | 'stripe';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -81,8 +81,9 @@ export default function CheckoutPage() {
 
   const [email, setEmail] = useState('');
   const [name,  setName]  = useState('');
-  // Default to mock while real Razorpay/Stripe integrations aren't wired yet.
-  const [method, setMethod] = useState<PayMethod>('mock');
+  // Razorpay is the default because most launch traffic is India-based (INR).
+  // Buyers in USD/EUR flip to Stripe via the picker below.
+  const [method, setMethod] = useState<PayMethod>('razorpay');
   const [busy, setBusy] = useState(false);
   const [err, setErr]   = useState<string | null>(null);
 
@@ -134,17 +135,16 @@ export default function CheckoutPage() {
         return;
       }
 
-      // Razorpay chosen but no keyId returned = admin left keys blank or
-      // enabled testMode. Fall through to a clear message so the buyer
-      // doesn't get stuck.
-      if (method !== 'mock') {
-        setErr(`Payment gateway (${method}) isn't fully configured yet. Pick "Mock" to preview the flow.`);
-        return;
-      }
-
-      const confirmed = await store.confirmMockPayment(order.id, email);
-      clear();
-      navigate(`/store/success/${confirmed.id}?token=${confirmed.downloadToken ?? ''}`);
+      // Fell through both provider paths — means the gateway didn't return
+      // the expected fields (no razorpayKeyId, no Stripe redirect URL).
+      // Usually means the admin hasn't pasted live keys yet, or testMode
+      // is still on in /admin/settings. Show a clear message instead of
+      // leaving the buyer with a silent stall.
+      setErr(
+        `Payment gateway (${method}) isn't configured. Please try again in a few minutes, or contact ${
+          import.meta.env.VITE_SUPPORT_EMAIL || 'support'
+        } if this keeps happening.`,
+      );
     } catch (e) {
       // Do NOT fabricate a fake success on network errors. The old path
       // navigated buyers to /store/success/{fakeId} with a synthesised
@@ -188,7 +188,7 @@ export default function CheckoutPage() {
 
           <fieldset className="space-y-3">
             <legend className="text-sm font-semibold text-ink">Payment method</legend>
-            <div className="grid sm:grid-cols-3 gap-3">
+            <div className="grid sm:grid-cols-2 gap-3">
               <PayChoice
                 checked={method === 'razorpay'} onClick={() => setMethod('razorpay')}
                 title="Razorpay" sub="UPI · cards · netbanking" icon={<IndianRupee size={14} />}
@@ -199,16 +199,10 @@ export default function CheckoutPage() {
                 title="Stripe" sub="Cards · 135+ currencies" icon={<CreditCard size={14} />}
                 tag="Global"
               />
-              <PayChoice
-                checked={method === 'mock'} onClick={() => setMethod('mock')}
-                title="Mock" sub="Test mode · instant" icon={<Lock size={14} />}
-                tag="Free"
-              />
             </div>
             <p className="text-[11px] text-muted">
               Razorpay uses inline Checkout.js; Stripe redirects to a hosted checkout page.
-              Both require live keys in /admin/settings. Use <b>Mock</b> to preview the
-              downloads flow end-to-end without any keys — nothing is charged.
+              Both are secured by the gateway — your card details never touch our servers.
             </p>
           </fieldset>
 
