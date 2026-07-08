@@ -34,12 +34,20 @@ async function openRazorpayCheckout(opts: {
   currency:    string;
   name:        string;
   email:       string;
+  /** Buyer's phone in E.164-ish form ("+91XXXXXXXXXX"). Passed to Razorpay's
+   *  prefill so the modal doesn't reuse whatever number the buyer's browser
+   *  cached from a previous session, and so our merchant-side confirmation
+   *  email shows the number the buyer just entered. Optional — Razorpay
+   *  will ask if it's missing. */
+  contact?:    string;
   onSuccess: () => void;
   onFailure: (msg: string) => void;
 }) {
   try {
     await loadRazorpayScript();
     if (!window.Razorpay) throw new Error('Razorpay SDK failed to load');
+    const prefill: Record<string, string> = { name: opts.name, email: opts.email };
+    if (opts.contact && opts.contact.trim()) prefill.contact = opts.contact.trim();
     const rzp = new window.Razorpay({
       key:         opts.keyId,
       order_id:    opts.orderId,
@@ -47,7 +55,11 @@ async function openRazorpayCheckout(opts: {
       currency:    opts.currency,
       name:        'Portfolio Store',
       description: 'Digital product purchase',
-      prefill:     { name: opts.name, email: opts.email },
+      prefill,
+      // Stop Razorpay from surfacing a "Save details for next time?" prompt
+      // — the merchant confirmation email should always show the number the
+      // buyer entered on THIS purchase, not something saved in a cookie.
+      remember_customer: false,
       // handler fires client-side on payment success. Server webhook is
       // the authoritative payment record — the handler just moves the
       // user to the success page. If webhook is delayed, the success
@@ -81,6 +93,7 @@ export default function CheckoutPage() {
 
   const [email, setEmail] = useState('');
   const [name,  setName]  = useState('');
+  const [phone, setPhone] = useState('');
   // Razorpay is the default because most launch traffic is India-based (INR).
   // Buyers in USD/EUR flip to Stripe via the picker below.
   const [method, setMethod] = useState<PayMethod>('razorpay');
@@ -101,6 +114,15 @@ export default function CheckoutPage() {
     setErr(null);
     if (!email || !name) { setErr('Name and email are required.'); return; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setErr('That email looks malformed.'); return; }
+    // Phone is required so the merchant confirmation and any Razorpay-side
+    // OTP/SMS goes to a number the buyer explicitly gave us — not something
+    // cached in their browser from a prior session. Accept 10-15 digits with
+    // an optional leading + / country code; Indian mobile stays 10 digits.
+    const phoneDigits = phone.replace(/[^\d]/g, '');
+    if (phoneDigits.length < 10 || phoneDigits.length > 15) {
+      setErr('Please enter a valid mobile number (10 digits for India, or with country code).');
+      return;
+    }
 
     setBusy(true);
     try {
@@ -119,6 +141,10 @@ export default function CheckoutPage() {
       // server will mark the order PAID; we just navigate the user to the
       // success page which polls for the download token.
       if (method === 'razorpay' && order.razorpayKeyId && order.paymentRef) {
+        // Normalise the phone to E.164 for Razorpay: if the buyer typed 10
+        // bare digits, assume India (+91). Anything else with a country
+        // code / + prefix is passed through as-is.
+        const contact = phoneDigits.length === 10 ? '+91' + phoneDigits : '+' + phoneDigits;
         await openRazorpayCheckout({
           keyId:       order.razorpayKeyId,
           orderId:     order.paymentRef,   // razorpay order id
@@ -126,6 +152,7 @@ export default function CheckoutPage() {
           currency:    order.currency,
           name,
           email,
+          contact,
           onSuccess: () => {
             clear();
             navigate(`/store/success/${order.id}`);
@@ -184,6 +211,8 @@ export default function CheckoutPage() {
             <Field label="Full name" name="name" value={name} setValue={setName} placeholder="Ada Lovelace" required />
             <Field label="Email" name="email" type="email" value={email} setValue={setEmail} placeholder="ada@example.com" required />
             <p className="text-[11px] text-muted">The download link goes here — double-check it.</p>
+            <Field label="Mobile number" name="phone" type="tel" value={phone} setValue={setPhone} placeholder="+91 98765 43210" required />
+            <p className="text-[11px] text-muted">Used only for payment-gateway OTP + order support. We don&apos;t send marketing.</p>
           </fieldset>
 
           <fieldset className="space-y-3">
