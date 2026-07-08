@@ -57,7 +57,6 @@ export default function AdminLoginPage() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="admin@example.com"
             autoComplete="email"
             className="input-clean mt-2"
           />
@@ -89,9 +88,6 @@ export default function AdminLoginPage() {
           {busy ? <><Loader2 size={14} className="animate-spin" /> Signing in…</> : <><LogIn size={14} /> Sign in</>}
         </button>
 
-        <p className="mt-6 text-[11px] text-muted text-center">
-          Sessions expire after 8 hours. Forgot the password? Set <code className="font-mono text-ink">APP_ADMIN_PASSWORD</code> on the server.
-        </p>
       </motion.form>
     </div>
   );
