@@ -155,7 +155,13 @@ export default function CheckoutPage() {
           contact,
           onSuccess: () => {
             clear();
-            navigate(`/store/success/${order.id}`);
+            // Pass the buyer's email through so the success page can poll
+            // /api/store/orders/{id}?email=... — that endpoint proves
+            // ownership by email match and returns the download token once
+            // the webhook mints it, so we can reveal the "Open downloads"
+            // button in-page instead of forcing the buyer to wait for the
+            // email round-trip.
+            navigate(`/store/success/${order.id}?email=${encodeURIComponent(email)}`);
           },
           onFailure: (msg) => setErr(msg),
         });

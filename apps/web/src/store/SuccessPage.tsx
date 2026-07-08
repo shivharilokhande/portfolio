@@ -1,16 +1,95 @@
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import { CheckCircle2, Mail, Download, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Mail, Download, ArrowRight, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { profile as staticProfile } from '../lib/data';
 import { useSection } from '../hooks/usePortfolioContent';
 import { useBrand } from '../components/BrandLogo';
 
+/**
+ * SuccessPage — landing after Razorpay/Stripe payment succeeds.
+ *
+ * Two entry paths:
+ *   1. Direct handoff from CheckoutPage — URL carries ?email=<buyer_email>.
+ *      We poll {@code GET /api/store/orders/{id}?email=…} every 3s. Once the
+ *      webhook flips the order to PAID and mints the download token, the
+ *      "Open my downloads" button appears.
+ *   2. Deep-link (e.g. buyer bookmarks the URL and comes back later) —
+ *      no email query param; we can't prove ownership so we just show the
+ *      "check your inbox" state and skip polling.
+ */
+const API_BASE = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
+const POLL_INTERVAL_MS = 3_000;
+const POLL_TIMEOUT_MS  = 3 * 60_000;  // 3 minutes — beyond that we assume the
+                                       // webhook is delayed and let the buyer
+                                       // fall back to the email link.
+
 export default function SuccessPage() {
   const { orderId } = useParams<{ orderId: string }>();
   const [params] = useSearchParams();
-  const token = params.get('token');
+  // The mock path used to pass ?token= directly; keep that as a fast-path for
+  // any legacy flows that still work that way.
+  const legacyToken = params.get('token');
+  const email       = params.get('email');
   const profile = useSection<typeof staticProfile>('profile', staticProfile);
   const brand   = useBrand();
+
+  const [pollingState, setPollingState] = useState<
+    { kind: 'idle' } |
+    { kind: 'polling'; attempts: number } |
+    { kind: 'ready'; token: string } |
+    { kind: 'timeout' } |
+    { kind: 'no-lookup' }
+  >(() => {
+    if (legacyToken) return { kind: 'ready', token: legacyToken };
+    if (!email || !orderId) return { kind: 'no-lookup' };
+    return { kind: 'polling', attempts: 0 };
+  });
+
+  useEffect(() => {
+    if (pollingState.kind !== 'polling') return;
+    if (!email || !orderId) return;
+
+    let cancelled = false;
+    const startedAt = Date.now();
+
+    async function tick() {
+      if (cancelled) return;
+      try {
+        const url = `${API_BASE}/api/store/orders/${encodeURIComponent(orderId!)}?email=${encodeURIComponent(email!)}`;
+        const res = await fetch(url, { cache: 'no-store' });
+        if (res.ok) {
+          const body = await res.json() as { status?: string; downloadToken?: string | null };
+          if (body.status === 'PAID' && body.downloadToken) {
+            if (!cancelled) setPollingState({ kind: 'ready', token: body.downloadToken });
+            return;
+          }
+        }
+      } catch {
+        // Network hiccups are fine — keep polling until the timeout.
+      }
+      if (cancelled) return;
+      if (Date.now() - startedAt > POLL_TIMEOUT_MS) {
+        setPollingState({ kind: 'timeout' });
+        return;
+      }
+      setPollingState((prev) => prev.kind === 'polling'
+        ? { kind: 'polling', attempts: prev.attempts + 1 }
+        : prev);
+      window.setTimeout(tick, POLL_INTERVAL_MS);
+    }
+
+    // Kick off the first probe immediately so a fast webhook is reflected
+    // without the initial 3-second wait.
+    tick();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const secondsElapsed = useMemo(() => {
+    if (pollingState.kind !== 'polling') return 0;
+    return pollingState.attempts * (POLL_INTERVAL_MS / 1000);
+  }, [pollingState]);
 
   return (
     <div className="max-w-content mx-auto px-4 sm:px-6 py-12">
@@ -40,14 +119,31 @@ export default function SuccessPage() {
           <div className="tier-1 p-5 ambient-float">
             <Download size={18} className="text-primary" />
             <h3 className="mt-3 font-semibold text-ink">Or jump in now</h3>
-            <p className="mt-1 text-xs text-ink-soft leading-relaxed">Use the button below to open your downloads page directly.</p>
+            <p className="mt-1 text-xs text-ink-soft leading-relaxed">
+              {pollingState.kind === 'ready'
+                ? 'Your download page is ready — button below.'
+                : pollingState.kind === 'polling'
+                ? `Finalising with the payment gateway… (${secondsElapsed}s)`
+                : pollingState.kind === 'timeout'
+                ? 'Taking longer than usual — the email link will still work when it arrives.'
+                : 'The email will land within 60 seconds — the link works from there.'}
+            </p>
           </div>
         </div>
 
-        {token && (
-          <Link to={`/store/downloads/${token}`} className="btn-primary mt-8 mx-auto text-base py-3">
+        {pollingState.kind === 'ready' && (
+          <Link
+            to={`/store/downloads/${pollingState.token}`}
+            className="btn-primary mt-8 mx-auto inline-flex items-center gap-2 text-base py-3"
+          >
             Open my downloads <ArrowRight size={14} />
           </Link>
+        )}
+        {pollingState.kind === 'polling' && (
+          <div className="mt-8 inline-flex items-center gap-2 text-sm text-ink-soft">
+            <Loader2 size={14} className="animate-spin" />
+            Waiting for the payment gateway to confirm…
+          </div>
         )}
 
         <p className="mt-6 text-[11px] text-muted">
