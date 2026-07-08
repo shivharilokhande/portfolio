@@ -96,20 +96,13 @@
             <version>${bucket4j.version}</version>
         </dependency>
 
-        <!-- Object storage (Cloudflare R2 — S3-compatible). We use only the
-             s3 + s3-presigner artifacts to keep the fat-jar small; pulling
-             the whole aws-sdk-bom would drag ~40 unused clients. -->
+        <!-- Object storage (Cloudflare R2 — S3-compatible). One artifact
+             is enough: the S3Presigner class we use to mint short-lived
+             download URLs lives under `software.amazon.awssdk.services.s3.presigner`
+             inside the main s3 jar, not in a separate artifact. -->
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
-            <version>${awssdk.version}</version>
-        </dependency>
-        <!-- Needed to mint short-lived presigned URLs for paid product ZIPs.
-             The presigner does NOT execute any HTTP itself — it just signs a
-             URL that the buyer's browser then fetches directly from R2. -->
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>s3-presigner</artifactId>
             <version>${awssdk.version}</version>
         </dependency>
 
