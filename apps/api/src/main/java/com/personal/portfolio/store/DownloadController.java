@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -40,6 +41,12 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping("/api/store/downloads")
+// Both handlers dereference Order.items which is FetchType.LAZY. Without an
+// active persistence session Hibernate throws LazyInitializationException at
+// serialization time, which the global handler turns into 500 "Link not
+// valid" from the client's perspective. readOnly=true so the tx doesn't
+// pretend to be able to write.
+@Transactional(readOnly = true)
 public class DownloadController {
 
     private static final Logger log = LoggerFactory.getLogger(DownloadController.class);

@@ -142,10 +142,11 @@ public class EmailService {
                 settings.siteTitle());
 
         String from    = settings.fromEmail();
-        String owner   = settings.notifyToEmail();
-        List<String> bcc = (owner != null && !owner.isBlank()) ? List.of(owner) : List.of();
-
-        Msg msg = new Msg(from, order.getEmail(), subject, body, null, bcc, settings.siteTitle());
+        // No BCC to the seller — customers were seeing the seller's personal
+        // address in their Gmail headers, which looked amateurish and
+        // exposed a working reply-to route. Sellers get order confirmations
+        // via /admin/orders (auto-refresh 30s) instead.
+        Msg msg = new Msg(from, order.getEmail(), subject, body, null, List.of(), settings.siteTitle());
         boolean ok = dispatch(msg);
         if (ok) {
             log.info("Sent order confirmation to {} for order #{}", order.getEmail(), order.getId());
