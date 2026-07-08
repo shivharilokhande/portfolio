@@ -22,6 +22,10 @@
         <bucket4j.version>8.10.1</bucket4j.version>
         <razorpay.version>1.4.8</razorpay.version>
         <stripe.version>26.9.0</stripe.version>
+        <!-- AWS SDK v2 is used for its S3 client + presigner. We target Cloudflare
+             R2 (fully S3-compatible) — the credential provider is a plain static
+             access-key/secret pair, no IMDS or STS involvement. -->
+        <awssdk.version>2.28.29</awssdk.version>
     </properties>
 
     <dependencies>
@@ -90,6 +94,23 @@
             <groupId>com.bucket4j</groupId>
             <artifactId>bucket4j-core</artifactId>
             <version>${bucket4j.version}</version>
+        </dependency>
+
+        <!-- Object storage (Cloudflare R2 — S3-compatible). We use only the
+             s3 + s3-presigner artifacts to keep the fat-jar small; pulling
+             the whole aws-sdk-bom would drag ~40 unused clients. -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>${awssdk.version}</version>
+        </dependency>
+        <!-- Needed to mint short-lived presigned URLs for paid product ZIPs.
+             The presigner does NOT execute any HTTP itself — it just signs a
+             URL that the buyer's browser then fetches directly from R2. -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3-presigner</artifactId>
+            <version>${awssdk.version}</version>
         </dependency>
 
         <!-- Payment gateways -->

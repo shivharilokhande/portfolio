@@ -97,18 +97,29 @@ app:
     password: ${APP_ADMIN_PASSWORD:123456}
 
   # ----- Asset storage -----
-  # Where uploaded product ZIPs, product demo images, and the admin CV PDF
-  # are written. Defaults to `apps/api/.storage/` inside the project so a
-  # fresh clone shows up immediately in the file tree — easy to browse,
-  # back up, and delete.
+  # Uploaded product ZIPs, product demo images, and the admin CV PDF go
+  # through the StorageService abstraction (see storage/StorageService.java).
   #
-  # In prod, set APP_STORAGE_DIR to a persistent volume path (e.g. an EBS
-  # mount, a bind-mounted Docker volume, or a shared NFS). Or swap the file
-  # writes in ProductAssetController / ProductImageController /
-  # ProfileAssetController for an S3 / R2 client — see the "TODO(prod)"
-  # comments in each file for the seams.
+  # Two providers ship in-tree:
+  #
+  #   provider=local  — writes to `base-path` on disk. Default. Fine for dev
+  #                     and for any host with a persistent volume mounted
+  #                     (Docker named volume, EBS, Render Starter+).
+  #   provider=r2     — writes to Cloudflare R2 (S3-compatible). The choice
+  #                     for hosts with ephemeral disks (Render Free tier,
+  #                     Fly.io free VMs, App Runner, Cloud Run). Requires
+  #                     the four r2.* properties below to be set — the app
+  #                     REFUSES TO BOOT if provider=r2 and any is missing,
+  #                     to prevent silent data loss.
   storage:
-    base-path: ${APP_STORAGE_DIR:./.storage}
+    provider:   ${APP_STORAGE_PROVIDER:local}
+    base-path:  ${APP_STORAGE_DIR:./.storage}
+    r2:
+      endpoint:          ${R2_ENDPOINT:}          # https://<account-id>.r2.cloudflarestorage.com
+      access-key-id:     ${R2_ACCESS_KEY_ID:}
+      secret-access-key: ${R2_SECRET_ACCESS_KEY:}
+      bucket:            ${R2_BUCKET:}
+      public-url-base:   ${R2_PUBLIC_URL:}        # https://pub-<hash>.r2.dev  OR  https://cdn.example.com
 
 # Mail — uses Spring's standard mail starter. SendGrid SMTP relay works out of the box:
 #   host=smtp.sendgrid.net, port=587, username=apikey, password=<SENDGRID_API_KEY>

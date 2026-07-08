@@ -1,21 +1,18 @@
 package com.personal.portfolio.admin;
 
+import com.personal.portfolio.storage.StorageService;
 import com.personal.portfolio.store.Product;
 import com.personal.portfolio.store.ProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -24,13 +21,21 @@ import java.util.Set;
 /**
  * Admin-only digital-asset uploads.
  *
+ * <pre>
  *   POST   /api/admin/products/{id}/asset     — multipart upload (ZIP / TGZ / 7Z)
  *   DELETE /api/admin/products/{id}/asset     — wipe the stored file
  *   GET    /api/admin/products/{id}/asset     — preview / download from admin
+ * </pre>
  *
- *   Saved to {app.storage.base-path}/products/{id}-{originalFilename}
- *   The Product.asset_path column stores the full filesystem path.
- *   In production swap save() to write to S3 and store the key instead.
+ * <p>Files are stored via {@link StorageService} under the object key
+ * {@code products/{id}-{sanitizedFilename}.{ext}}. This key is what we
+ * persist in {@code Product.assetPath} — it is stable across storage
+ * providers (R2, local disk, future S3), so switching providers doesn't
+ * require a DB migration.
+ *
+ * <p>Path-traversal guards from the pre-migration version are unnecessary
+ * against R2 (object keys are just strings, not filesystem paths) but we
+ * still sanitise the user-supplied filename to keep keys readable.
  */
 @RestController
 @RequestMapping("/api/admin/products/{id}/asset")
@@ -44,17 +49,11 @@ public class ProductAssetController {
     );
 
     private final ProductRepository products;
-    private final Path baseDir;
+    private final StorageService storage;
 
-    public ProductAssetController(
-            ProductRepository products,
-            @Value("${app.storage.base-path}") String basePath) throws IOException {
+    public ProductAssetController(ProductRepository products, StorageService storage) {
         this.products = products;
-        // Absolute + normalised so `path.startsWith(baseDir)` traversal guards
-        // downstream match peer controllers (ProductImage, Download, ProfileAsset).
-        this.baseDir = Path.of(basePath, "products").toAbsolutePath().normalize();
-        Files.createDirectories(this.baseDir);
-        log.info("Product asset storage: {}", this.baseDir);
+        this.storage  = storage;
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -75,24 +74,30 @@ public class ProductAssetController {
                     "message", "Only ZIP / TAR / TGZ / GZ / 7Z bundles are accepted."));
         }
 
-        // Ensure resolved target stays inside baseDir even if sanitisation misses something.
-        Path target = baseDir.resolve(id + "-" + original).normalize();
-        if (!target.startsWith(baseDir)) {
-            return ResponseEntity.badRequest().body(Map.of("error", "bad_filename"));
-        }
-        Files.copy(file.getInputStream(), target, StandardCopyOption.REPLACE_EXISTING);
+        // Object key = "products/{id}-{sanitized-filename}.{ext}". Provider-
+        // agnostic; no filesystem semantics baked in.
+        String objectKey = "products/" + id + "-" + original;
 
-        p.setAssetPath(target.toAbsolutePath().toString());
-        // Update reported file size in MB
-        int mb = (int) Math.max(1, Math.round(Files.size(target) / 1024.0 / 1024.0));
+        // If the buyer already had a bundle uploaded, R2's put replaces it
+        // atomically; if the filename changed we also purge the old key so
+        // we don't accumulate orphans.
+        String previousKey = p.getAssetPath();
+        storage.upload(objectKey, file.getInputStream(), file.getSize(),
+                file.getContentType() != null ? file.getContentType() : "application/octet-stream");
+        if (previousKey != null && !previousKey.equals(objectKey) && looksLikeObjectKey(previousKey)) {
+            try { storage.delete(previousKey); }
+            catch (IOException e) { log.warn("Could not delete previous asset {}: {}", previousKey, e.getMessage()); }
+        }
+
+        p.setAssetPath(objectKey);
+        int mb = (int) Math.max(1, Math.round(file.getSize() / 1024.0 / 1024.0));
         p.setFileSizeMb(mb);
         products.save(p);
 
-        log.info("Uploaded {} bytes to {} for product #{}", Files.size(target), target, id);
-        // NOTE: do not leak the absolute server path in the response.
+        log.info("Uploaded {} bytes to storage key {} for product #{}", file.getSize(), objectKey, id);
         return ResponseEntity.ok(Map.of(
                 "ok",         true,
-                "fileName",   target.getFileName().toString(),
+                "fileName",   original,
                 "fileSizeMb", mb
         ));
     }
@@ -102,11 +107,11 @@ public class ProductAssetController {
     public ResponseEntity<?> remove(@PathVariable Long id) throws IOException {
         Product p = products.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Product " + id + " not found"));
-        if (p.getAssetPath() != null) {
-            Path path = Path.of(p.getAssetPath()).toAbsolutePath().normalize();
-            // Only delete files inside baseDir — no arbitrary FS deletes.
-            if (path.startsWith(baseDir)) {
-                try { Files.deleteIfExists(path); } catch (IOException ignored) {}
+        String key = p.getAssetPath();
+        if (key != null) {
+            if (looksLikeObjectKey(key)) {
+                try { storage.delete(key); }
+                catch (IOException e) { log.warn("Could not delete asset {}: {}", key, e.getMessage()); }
             }
             p.setAssetPath(null);
             products.save(p);
@@ -115,17 +120,18 @@ public class ProductAssetController {
     }
 
     @GetMapping
-    public ResponseEntity<?> preview(@PathVariable Long id) {
+    public ResponseEntity<?> preview(@PathVariable Long id) throws IOException {
         Product p = products.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Product " + id + " not found"));
-        if (p.getAssetPath() == null) return ResponseEntity.notFound().build();
-        Path path = Path.of(p.getAssetPath()).toAbsolutePath().normalize();
-        // Path-traversal guard — asset must live inside the configured base dir.
-        if (!path.startsWith(baseDir) || !Files.exists(path)) return ResponseEntity.notFound().build();
+        String key = p.getAssetPath();
+        if (key == null || !looksLikeObjectKey(key) || !storage.exists(key)) {
+            return ResponseEntity.notFound().build();
+        }
+        String displayName = key.substring(key.lastIndexOf('/') + 1);
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=\"" + path.getFileName() + "\"")
+                .header("Content-Disposition", "attachment; filename=\"" + displayName + "\"")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(new FileSystemResource(path));
+                .body(new InputStreamResource(storage.openStream(key)));
     }
 
     /** Strip path separators and exotic characters from user-supplied filenames. */
@@ -142,5 +148,16 @@ public class ProductAssetController {
     private static String extensionOf(String filename) {
         int i = filename.lastIndexOf('.');
         return i < 0 ? "" : filename.substring(i).toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * Legacy rows written before the R2 migration hold absolute filesystem
+     * paths in {@code assetPath}. Those are useless once the disk is wiped;
+     * we don't try to read from them and we don't try to delete them either
+     * (they're not our concern once the row is re-uploaded). This helper
+     * distinguishes new-style object keys from old-style FS paths.
+     */
+    static boolean looksLikeObjectKey(String value) {
+        return value != null && !value.startsWith("/") && !value.contains(":");
     }
 }

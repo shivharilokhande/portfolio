@@ -2,15 +2,16 @@ package com.personal.portfolio.store;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.http.MediaType;
+import com.personal.portfolio.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.IOException;
+import java.net.URI;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -21,12 +22,31 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
- *   GET /api/store/downloads/{token}        → bundle (lists each file with a signed URL)
- *   GET /api/store/downloads/{token}/file/{productId} → stream the file (stub: 302 to assetPath)
+ * <pre>
+ *   GET /api/store/downloads/{token}                     → bundle (list of files + signed URLs)
+ *   GET /api/store/downloads/{token}/file/{productId}    → 302 to presigned R2 URL for that file
+ * </pre>
+ *
+ * <p>Once the storage migration lands, the bytes never flow through this
+ * app. We validate the download token + order state + rate limit, then
+ * return a 302 redirect to a short-lived presigned R2 URL. Buyers download
+ * directly from Cloudflare's edge — free egress, near-zero CPU cost on our
+ * side, and the URL expires in ~2 minutes so a leaked link is useless
+ * immediately.
+ *
+ * <p>Legacy orders where {@code assetPath} is an absolute filesystem path
+ * (pre-migration) can no longer be served — the file is on the wiped
+ * Render disk. The endpoint returns 410 Gone with a hint to re-upload.
  */
 @RestController
 @RequestMapping("/api/store/downloads")
 public class DownloadController {
+
+    private static final Logger log = LoggerFactory.getLogger(DownloadController.class);
+    /** How long each presigned URL is valid. Two minutes is long enough for
+     *  a slow retry, short enough that copy-pasting the URL into a chat
+     *  won't leak the download to anyone who sees it later. */
+    private static final Duration PRESIGN_TTL = Duration.ofSeconds(120);
 
     public record DownloadBundleDto(
             Long             orderId,
@@ -46,7 +66,7 @@ public class DownloadController {
 
     private final OrderRepository orders;
     private final ProductRepository products;
-    private final Path baseDir;
+    private final StorageService storage;
     /** Cap on file downloads per token per rolling hour. Legitimate buyers
      *  download each item a handful of times — 20/hour is generous. A
      *  leaked link that goes viral on Reddit gets throttled fast, and the
@@ -61,10 +81,10 @@ public class DownloadController {
 
     public DownloadController(OrderRepository orders,
                               ProductRepository products,
-                              @Value("${app.storage.base-path}") String basePath) {
+                              StorageService storage) {
         this.orders   = orders;
         this.products = products;
-        this.baseDir  = Path.of(basePath, "products").toAbsolutePath().normalize();
+        this.storage  = storage;
     }
 
     @GetMapping("/{token}")
@@ -108,16 +128,17 @@ public class DownloadController {
     }
 
     /**
-     * Streams the asset file to a paying customer. In a full deploy this would
-     * redirect to a pre-signed S3 URL — for now we stream from local disk.
+     * Redirects the paying customer to a short-lived presigned R2 URL for
+     * their file. The app validates the download token and order state,
+     * then hands off — the bytes come from Cloudflare's edge, not us.
      *
      *   Safety guarantees:
      *   - token must match a PAID, non-expired order
      *   - product must be part of that order (prevents cross-order access)
-     *   - asset path must resolve INSIDE the configured baseDir (no traversal)
+     *   - per-token quota bounds link-sharing damage (20 hits/hour)
      */
     @GetMapping("/{token}/file/{productId}")
-    public ResponseEntity<?> file(@PathVariable String token, @PathVariable Long productId) {
+    public ResponseEntity<?> file(@PathVariable String token, @PathVariable Long productId) throws IOException {
         Optional<Order> found = orders.findByDownloadToken(token);
         if (found.isEmpty()) return ResponseEntity.status(403).build();
         Order o = found.get();
@@ -145,17 +166,28 @@ public class DownloadController {
         if (p == null || p.getAssetPath() == null || p.getAssetPath().isBlank())
             return ResponseEntity.status(404).body("Asset not yet uploaded for product " + productId);
 
-        // Path-traversal guard: resolved absolute path must be inside baseDir.
-        Path path = Path.of(p.getAssetPath()).toAbsolutePath().normalize();
-        if (!path.startsWith(baseDir) || !Files.exists(path) || !Files.isRegularFile(path)) {
+        String key = p.getAssetPath();
+        // Legacy path guard — old rows may hold absolute FS paths that no
+        // longer exist. Those bytes are gone; the seller must re-upload.
+        if (key.startsWith("/") || key.contains(":")) {
+            log.warn("Product #{} has a legacy filesystem path in assetPath; the file is not in R2. Re-upload required.", productId);
+            return ResponseEntity.status(410).body(
+                    "The file for this product needs to be re-uploaded to the new storage backend. "
+                    + "The seller has been notified.");
+        }
+        if (!storage.exists(key)) {
+            log.warn("Product #{} references key {} which is not in storage.", productId, key);
             return ResponseEntity.status(404).build();
         }
 
-        String filename = path.getFileName().toString();
-        return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
+        String signed = storage.presignedGetUrl(key, PRESIGN_TTL);
+        return ResponseEntity.status(302)
+                .header(HttpHeaders.LOCATION, signed)
                 .header("X-RateLimit-Remaining", String.valueOf(Math.max(0, MAX_FILE_DOWNLOADS_PER_HOUR - current)))
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(new FileSystemResource(path));
+                // Never let a 302 or its Location header get cached — the
+                // presigned URL expires quickly and a stale redirect is a
+                // guaranteed download failure.
+                .header(HttpHeaders.CACHE_CONTROL, "no-store")
+                .build();
     }
 }
