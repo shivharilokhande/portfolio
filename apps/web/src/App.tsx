@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react';
 import { Route, Routes, Navigate } from 'react-router-dom';
 import ScrollToHash from './components/ScrollToHash';
 import { useSiteMeta } from './hooks/useSiteMeta';
+import { PortfolioContentProvider } from './hooks/usePortfolioContent';
 
 const PortfolioPage  = lazy(() => import('./pages/PortfolioPage'));
 const StoreLayout    = lazy(() => import('./store/StoreLayout'));
@@ -43,6 +44,13 @@ export default function App() {
   // buyers of the template can rebrand SEO without editing index.html.
   useSiteMeta();
   return (
+    // Provider lifted here (was previously only inside PortfolioPage) so
+    // useSection() works on every route that renders CMS-driven UI —
+    // notably LegalPage (/legal/:slug), the Footer, and Header. Without it,
+    // those components fall back to static defaults even when the CMS row
+    // is populated. Polling overhead is ~one request per 20s while the tab
+    // is visible; the /api/portfolio endpoint is public and cheap.
+    <PortfolioContentProvider>
     <Suspense fallback={<div className="min-h-screen bg-bg" aria-hidden />}>
       {/* Rescues in-page anchor navigation across lazy-loaded routes. */}
       <ScrollToHash />
@@ -82,5 +90,6 @@ export default function App() {
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Suspense>
+    </PortfolioContentProvider>
   );
 }

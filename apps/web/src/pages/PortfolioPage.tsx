@@ -20,7 +20,9 @@ import Testimonials from '../sections/Testimonials';
 import Services from '../sections/Services';
 import Contact from '../sections/Contact';
 import Footer from '../sections/Footer';
-import { PortfolioContentProvider } from '../hooks/usePortfolioContent';
+// PortfolioContentProvider now wraps <Routes> at the App root so every
+// route (Legal, Store, Footer) can useSection. This file no longer nests
+// its own provider.
 
 const Skills = lazy(() => import('../sections/Skills'));
 
@@ -43,36 +45,33 @@ export default function PortfolioPage() {
   }, []);
 
   return (
-    <PortfolioContentProvider>
-      <div className="relative min-h-screen surface text-ink overflow-x-hidden">
-        <LoadingScreen
-          progress={progress}
-          done={booted}
-          label="Preparing the experience"
-        />
+    <div className="relative min-h-screen surface text-ink overflow-x-hidden">
+      <LoadingScreen
+        progress={progress}
+        done={booted}
+        label="Preparing the experience"
+      />
 
-        <ScrollProgress />
-        <ScrollAurora />
-        <Header />
+      <ScrollProgress />
+      <ScrollAurora />
+      <Header />
 
-        <main id="content" className="relative z-10">
-          <Hero />
-          <About />
-          <Suspense fallback={<div className="h-[60vh]" aria-hidden />}>
-            <Skills />
-          </Suspense>
-          <Timeline />
-          <Projects />
-          <Testimonials />
-          <Services />
-          <Contact />
-        </main>
+      <main id="content" className="relative z-10">
+        <Hero />
+        <About />
+        <Suspense fallback={<div className="h-[60vh]" aria-hidden />}>
+          <Skills />
+        </Suspense>
+        <Timeline />
+        <Projects />
+        <Testimonials />
+        <Services />
+        <Contact />
+      </main>
 
-        {/* Footer must stay INSIDE the Provider so its useSection('profile')
-            picks up admin CMS edits (was previously outside → footer stayed
-            on static data forever). */}
-        <Footer />
-      </div>
-    </PortfolioContentProvider>
+      {/* Footer's useSection('profile') resolves against the App-level
+          PortfolioContentProvider that wraps the entire route tree. */}
+      <Footer />
+    </div>
   );
 }
