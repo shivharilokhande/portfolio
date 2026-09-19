@@ -37,6 +37,8 @@ export type AdminOrder = {
   status:         string;
   downloadToken:  string | null;
   items:          { productId: number; title: string; price: number }[];
+  /** ISO-8601 creation time (absent on older API builds). */
+  createdAt?:     string;
 };
 
 export type AdminContact = {

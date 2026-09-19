@@ -13,6 +13,7 @@ import {
   Sparkles, Eye, EyeOff, ImagePlus, X,
 } from 'lucide-react';
 import { adminApi, type AdminProduct } from './adminApi';
+import { assetUrl } from '../lib/api';
 
 type FormState = {
   slug:         string;
@@ -210,8 +211,12 @@ export default function AdminProductFormPage() {
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Failed to remove image.');
       // Roll back — reload the product to be safe.
-      const fresh = await adminApi.product(product.id);
-      setImages(fresh.demoImages ?? []);
+      try {
+        const fresh = await adminApi.product(product.id);
+        setImages(fresh.demoImages ?? []);
+      } catch (e2) {
+        setErr(e2 instanceof Error ? e2.message : 'Failed to reload product images.');
+      }
     }
   }
 
@@ -436,9 +441,13 @@ export default function AdminProductFormPage() {
                       onClick={async () => {
                         if (!product) return;
                         if (!confirm('Delete the uploaded archive?')) return;
-                        await adminApi.removeAsset(product.id);
-                        setUploadInfo(null);
-                        setOkMsg('Archive removed.');
+                        try {
+                          await adminApi.removeAsset(product.id);
+                          setUploadInfo(null);
+                          setOkMsg('Archive removed.');
+                        } catch (e) {
+                          setErr(e instanceof Error ? e.message : 'Failed to remove archive.');
+                        }
                       }}
                       className="text-ink-soft hover:text-red-700"
                       aria-label="Remove archive"
@@ -460,7 +469,7 @@ export default function AdminProductFormPage() {
                 <div className="grid grid-cols-3 gap-2">
                   {images.map((url) => (
                     <div key={url} className="relative group rounded-lg overflow-hidden surface-low ambient-float aspect-square">
-                      <img src={url} alt="" className="w-full h-full object-cover" loading="lazy" />
+                      <img src={assetUrl(url)} alt="" className="w-full h-full object-cover" loading="lazy" />
                       <button
                         type="button"
                         onClick={() => onRemoveImage(url)}
@@ -541,6 +550,8 @@ function Toggle({
   return (
     <button
       type="button"
+      role="switch"
+      aria-checked={checked}
       onClick={() => onChange(!checked)}
       className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
         checked ? 'bg-green-50 ring-1 ring-primary/40' : 'surface-low ghost-line hover:bg-surface-container'

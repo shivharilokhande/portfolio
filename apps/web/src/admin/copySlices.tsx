@@ -37,6 +37,7 @@ function useCopySlice<T>(
   section: Section,
   select: (doc: CopyDoc) => T,
   assemble: (doc: CopyDoc, local: T) => CopyDoc,
+  onSaved?: () => void,
 ) {
   const [local, setLocal] = useState<T>(() => select(mergeCopy(section.body)));
   const [busy, setBusy] = useState(false);
@@ -78,6 +79,8 @@ function useCopySlice<T>(
       initialRef.current = JSON.stringify(local);
       setDirty(false);
       setMsg('Saved · live on site.');
+      // Let the parent refetch so sibling slices merge against fresh body.
+      onSaved?.();
     } catch (e) {
       setErr(e instanceof Error ? e.message : 'Save failed.');
     } finally {
@@ -138,17 +141,19 @@ function SliceCard({
  *  Section-header slice — edits copy.sectionHeaders[key]
  * ========================================================================= */
 export function SectionHeaderSlice({
-  section, headerKey, title, description,
+  section, headerKey, title, description, onSaved,
 }: {
   section: Section;
   headerKey: keyof CopyDoc['sectionHeaders'];
   title: string;
   description?: string;
+  onSaved?: () => void;
 }) {
   const slice = useCopySlice(
     section,
     (d) => d.sectionHeaders[headerKey],
     (d, local) => ({ ...d, sectionHeaders: { ...d.sectionHeaders, [headerKey]: local } }),
+    onSaved,
   );
   const v = slice.local;
   return (
@@ -168,11 +173,12 @@ export function SectionHeaderSlice({
 /* =========================================================================
  *  Hero right-side card slice — copy.heroCard
  * ========================================================================= */
-export function HeroCardSlice({ section }: { section: Section }) {
+export function HeroCardSlice({ section, onSaved }: { section: Section; onSaved?: () => void }) {
   const slice = useCopySlice(
     section,
     (d) => d.heroCard,
     (d, local) => ({ ...d, heroCard: local }),
+    onSaved,
   );
   const v = slice.local;
   return (
@@ -211,11 +217,12 @@ export function HeroCardSlice({ section }: { section: Section }) {
 /* =========================================================================
  *  About pillars slice — copy.aboutPillars
  * ========================================================================= */
-export function AboutPillarsSlice({ section }: { section: Section }) {
+export function AboutPillarsSlice({ section, onSaved }: { section: Section; onSaved?: () => void }) {
   const slice = useCopySlice(
     section,
     (d) => d.aboutPillars,
     (d, local) => ({ ...d, aboutPillars: local }),
+    onSaved,
   );
   return (
     <SliceCard
@@ -279,11 +286,12 @@ export function AboutPillarsSlice({ section }: { section: Section }) {
 /* =========================================================================
  *  Contact block slice — copy.contact (trust chips, quote, fields, buttons)
  * ========================================================================= */
-export function ContactBlockSlice({ section }: { section: Section }) {
+export function ContactBlockSlice({ section, onSaved }: { section: Section; onSaved?: () => void }) {
   const slice = useCopySlice(
     section,
     (d) => d.contact,
     (d, local) => ({ ...d, contact: local }),
+    onSaved,
   );
   const v = slice.local;
   function setField<K extends keyof typeof v>(field: K, val: typeof v[K]) {
@@ -344,11 +352,12 @@ export function ContactBlockSlice({ section }: { section: Section }) {
 /* =========================================================================
  *  Footer slice — copy.footer
  * ========================================================================= */
-export function FooterSlice({ section }: { section: Section }) {
+export function FooterSlice({ section, onSaved }: { section: Section; onSaved?: () => void }) {
   const slice = useCopySlice(
     section,
     (d) => d.footer,
     (d, local) => ({ ...d, footer: local }),
+    onSaved,
   );
   const v = slice.local;
   function setField<K extends keyof typeof v>(field: K, val: string) {

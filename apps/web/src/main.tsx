@@ -1,5 +1,6 @@
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+import { MotionConfig } from 'framer-motion';
 import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
 import './index.css';
@@ -12,7 +13,9 @@ import './index.css';
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <ErrorBoundary>
     <BrowserRouter>
-      <App />
+      <MotionConfig reducedMotion="user">
+        <App />
+      </MotionConfig>
     </BrowserRouter>
   </ErrorBoundary>,
 );

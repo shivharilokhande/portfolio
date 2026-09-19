@@ -312,6 +312,12 @@ body {
 /* canvas containers */
 .canvas-host { position: absolute; inset: 0; z-index: 0; }
 
+/* floating skill dots (Skills.tsx CSS fallback) */
+@keyframes float {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+  50%      { transform: translate(-50%, -50%) translateY(-8px); }
+}
+
 /* shimmer skeleton */
 @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
 .shimmer {

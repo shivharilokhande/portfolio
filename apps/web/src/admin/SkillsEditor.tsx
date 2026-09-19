@@ -36,7 +36,13 @@ export default function SkillsEditor({
   const [msg, setMsg]   = useState<string | null>(null);
   const [err, setErr]   = useState<string | null>(null);
 
-  useEffect(() => { setCats(withIds(body)); setDirty(false); }, [body]);
+  // Re-sync from server body only when its content changed and nothing is dirty.
+  const bodyKey = JSON.stringify(body ?? null);
+  useEffect(() => {
+    if (dirty) return;
+    setCats(withIds(body)); setDirty(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bodyKey]);
 
   function mutate(next: Category[]) { setCats(next); setDirty(true); }
   function patchCat(id: string, patch: Partial<Category>) {

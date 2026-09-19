@@ -1,6 +1,7 @@
 package com.personal.portfolio.store;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
 public record OrderResponse(
@@ -15,7 +16,9 @@ public record OrderResponse(
         String        paymentRedirectUrl,
         /** Razorpay Checkout.js needs the public key id client-side. Null otherwise. */
         String        razorpayKeyId,
-        List<Line>    items
+        List<Line>    items,
+        /** When the order was created (ISO-8601 in JSON). */
+        Instant       createdAt
 ) {
     public record Line(Long productId, String title, BigDecimal price) {}
 
@@ -48,6 +51,7 @@ public record OrderResponse(
                 includeToken ? o.getDownloadToken() : null,
                 paymentRedirectUrl,
                 razorpayKeyId,
-                lines);
+                lines,
+                o.getCreatedAt());
     }
 }

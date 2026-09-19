@@ -10,6 +10,7 @@ import { useRef } from 'react';
 import { Download, Sparkles, ArrowRight, ArrowDown } from 'lucide-react';
 import { profile as staticProfile } from '../lib/data';
 import { useSection } from '../hooks/usePortfolioContent';
+import { assetUrl } from '../lib/api';
 import { copyDefaults, mergeCopy } from '../lib/copyDefaults';
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
@@ -129,7 +130,7 @@ export default function Hero() {
                 <motion.a
                   variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
                   transition={{ duration: 0.5, ease: easeOut }}
-                  href={profile.cvUrl}
+                  href={assetUrl(profile.cvUrl)}
                   download={cvDownloadName(profile)}
                   target={profile.cvUrl.startsWith('http') ? '_blank' : undefined}
                   rel={profile.cvUrl.startsWith('http') ? 'noreferrer' : undefined}

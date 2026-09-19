@@ -33,7 +33,8 @@ export default function CartPage() {
       <p className="mt-2 text-ink-soft">{lines.length} product{lines.length > 1 ? 's' : ''} ready to ship to you.</p>
 
       <div className="mt-8 grid lg:grid-cols-12 gap-8">
-        <ul className="lg:col-span-8 space-y-3">
+        <div className="lg:col-span-8">
+        <ul className="space-y-3">
           <AnimatePresence initial={false}>
             {lines.map((l, idx) => {
               const unit = currency === 'INR' ? l.priceInr : l.priceUsd;
@@ -88,12 +89,15 @@ export default function CartPage() {
               );
             })}
           </AnimatePresence>
-
-          <button
-            onClick={clear}
-            className="text-xs text-ink-soft hover:text-red-700 underline-offset-4 hover:underline"
-          >Clear cart</button>
         </ul>
+
+        {/* Kept outside the <ul> — a <button> may not be a direct child of a list. */}
+        <button
+          type="button"
+          onClick={clear}
+          className="mt-3 text-xs text-ink-soft hover:text-red-700 underline-offset-4 hover:underline"
+        >Clear cart</button>
+        </div>
 
         <aside className="lg:col-span-4">
           <div className="lg:sticky lg:top-24 tier-3 ambient-float-lg p-6">

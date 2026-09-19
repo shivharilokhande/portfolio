@@ -108,6 +108,7 @@ function ProjectTileView({ p, idx }: { p: ProjectTile; idx: number }) {
 
   return (
     <motion.div
+      role="listitem"
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}

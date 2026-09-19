@@ -133,6 +133,9 @@ export default function CheckoutPage() {
 
       // Stripe → hosted checkout redirect.
       if (order.paymentRedirectUrl) {
+        // Stripe's success_url only carries the session id, so stash the
+        // buyer email for SuccessPage's ownership polling.
+        try { sessionStorage.setItem('checkout.email', email); } catch { /* storage unavailable */ }
         window.location.href = order.paymentRedirectUrl;
         return;
       }

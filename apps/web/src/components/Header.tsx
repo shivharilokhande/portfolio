@@ -4,6 +4,7 @@ import { Menu, X, ShoppingBag, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { profile as staticProfile } from '../lib/data';
 import { useSection } from '../hooks/usePortfolioContent';
+import { assetUrl } from '../lib/api';
 import { useCart } from '../store/cartStore';
 import BrandLogo from './BrandLogo';
 
@@ -120,7 +121,7 @@ export default function Header() {
               it's ignored and the file opens in a new tab. */}
           {isValidCvUrl(profile.cvUrl) && (
             <a
-              href={profile.cvUrl}
+              href={assetUrl(profile.cvUrl)}
               download={cvDownloadName(profile)}
               target={profile.cvUrl.startsWith('http') ? '_blank' : undefined}
               rel={profile.cvUrl.startsWith('http') ? 'noreferrer' : undefined}

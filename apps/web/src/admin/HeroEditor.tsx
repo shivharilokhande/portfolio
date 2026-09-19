@@ -46,8 +46,13 @@ export default function HeroEditor({
   const [err,   setErr]   = useState<string | null>(null);
   const [newWord, setNewWord] = useState('');
 
-  // Re-sync if API refresh swaps body
-  useEffect(() => { setDoc(mergeDefaults(body)); setDirty(false); }, [body]);
+  // Re-sync if API refresh swaps body — but never over in-progress edits.
+  const bodyKey = JSON.stringify(body ?? null);
+  useEffect(() => {
+    if (dirty) return;
+    setDoc(mergeDefaults(body)); setDirty(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bodyKey]);
 
   function mutate(next: HeroDoc) { setDoc(next); setDirty(true); }
   function setField<K extends keyof HeroDoc>(k: K, v: HeroDoc[K]) { mutate({ ...doc, [k]: v }); }

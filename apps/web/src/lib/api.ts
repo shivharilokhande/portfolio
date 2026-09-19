@@ -60,5 +60,12 @@ export const api = {
                 '/api/contact', { method: 'POST', body: JSON.stringify(payload) }),
 };
 
+/** Resolve a server-relative asset path (e.g. "/api/store/products/1/images/x.png")
+ *  against the configured API base so it works when the frontend is served
+ *  from a different origin than the backend. Absolute URLs pass through. */
+export function assetUrl(u: string): string {
+  return u.startsWith('/api/') ? `${BASE}${u}` : u;
+}
+
 /** Whether the env points at a real backend. Useful for graceful fallbacks. */
 export const apiConfigured = BASE.length > 0;

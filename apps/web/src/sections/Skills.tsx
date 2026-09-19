@@ -17,16 +17,18 @@ import { fadeUp, stagger } from '../lib/motion';
 
 const SkillsCanvas = lazy(() => import('../components/three/SkillsCanvas'));
 
-function SkillsCSSFallback() {
+type SkillCategories = typeof staticSkillCategories;
+
+function SkillsCSSFallback({ categories }: { categories: SkillCategories }) {
   return (
     <div className="absolute inset-0 grid place-items-center overflow-hidden" aria-hidden>
       <div className="relative w-[70%] aspect-square">
-        {staticSkillCategories.flatMap((c) => c.skills).map((_, i, all) => {
+        {categories.flatMap((c) => c.skills).map((_, i, all) => {
           const a = (i / all.length) * Math.PI * 2;
           const r = 38 + (i % 3) * 6;
           const x = 50 + Math.cos(a) * r;
           const y = 50 + Math.sin(a) * r;
-          const color = staticSkillCategories[i % staticSkillCategories.length].color;
+          const color = categories[i % categories.length].color;
           return (
             <span
               key={i}
@@ -47,7 +49,7 @@ function SkillsCSSFallback() {
 }
 
 const avg = (a: { level: number }[]) => Math.round(a.reduce((s, x) => s + x.level, 0) / Math.max(1, a.length));
-const peak = (a: { level: number }[]) => Math.max(...a.map((x) => x.level));
+const peak = (a: { level: number }[]) => (a.length ? Math.max(...a.map((x) => x.level)) : 0);
 
 /** CMS-driven section header. Lives outside `Skills` so the parent stays
  *  focused on layout — the header itself is edited from
@@ -148,13 +150,13 @@ export default function Skills() {
                 the parent regardless of sibling layout. */}
             <div className="absolute inset-0">
               {webglOk ? (
-                <SafeCanvas fallback={<SkillsCSSFallback />}>
+                <SafeCanvas fallback={<SkillsCSSFallback categories={skillCategories} />}>
                   <Suspense fallback={<div className="absolute inset-0 grid place-items-center text-muted text-sm">Spinning up the cluster…</div>}>
-                    <SkillsCanvas />
+                    <SkillsCanvas categories={skillCategories} />
                   </Suspense>
                 </SafeCanvas>
               ) : (
-                <SkillsCSSFallback />
+                <SkillsCSSFallback categories={skillCategories} />
               )}
             </div>
 

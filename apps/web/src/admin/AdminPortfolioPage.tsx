@@ -250,7 +250,7 @@ function renderTab(tabKey: string, sections: Section[], reload: () => void): Rea
           {hero
             ? <HeroEditor sectionKey="hero" label={hero.label} body={hero.body} onSaved={reload} />
             : <MissingRow name="hero" />}
-          {copy && <HeroCardSlice section={copy} />}
+          {copy && <HeroCardSlice section={copy} onSaved={reload} />}
         </>
       );
     }
@@ -262,11 +262,11 @@ function renderTab(tabKey: string, sections: Section[], reload: () => void): Rea
       return (
         <>
           {copy
-            ? <SectionHeaderSlice section={copy} headerKey="about"
+            ? <SectionHeaderSlice section={copy} headerKey="about" onSaved={reload}
                                   title="About — section header"
                                   description="Eyebrow, title, description. Leave description empty to fall back to your profile one-liner." />
             : <MissingRow name="copy" />}
-          {copy && <AboutPillarsSlice section={copy} />}
+          {copy && <AboutPillarsSlice section={copy} onSaved={reload} />}
           {stats && <ArrayEditor sectionKey="stats" label="Headline stats (the 4 tiles)" body={stats.body} onSaved={reload} />}
           {education && <ArrayEditor sectionKey="education" label="Education" body={education.body} onSaved={reload} />}
           {certifications && <ArrayEditor sectionKey="certifications" label="Certifications" body={certifications.body} onSaved={reload} />}
@@ -278,7 +278,7 @@ function renderTab(tabKey: string, sections: Section[], reload: () => void): Rea
       const skills = find(sections, 'skills');
       return (
         <>
-          {copy && <SectionHeaderSlice section={copy} headerKey="skills"
+          {copy && <SectionHeaderSlice section={copy} headerKey="skills" onSaved={reload}
                                        title="Skills — section header" />}
           {skills
             ? <SkillsEditor sectionKey="skills" label="Skills pillars" body={skills.body} onSaved={reload} />
@@ -291,7 +291,7 @@ function renderTab(tabKey: string, sections: Section[], reload: () => void): Rea
       const timeline = find(sections, 'timeline');
       return (
         <>
-          {copy && <SectionHeaderSlice section={copy} headerKey="timeline"
+          {copy && <SectionHeaderSlice section={copy} headerKey="timeline" onSaved={reload}
                                        title="Journey — section header" />}
           {timeline
             ? <ArrayEditor sectionKey="timeline" label="Career chapters" body={timeline.body} onSaved={reload} />
@@ -304,7 +304,7 @@ function renderTab(tabKey: string, sections: Section[], reload: () => void): Rea
       const projects = find(sections, 'projects');
       return (
         <>
-          {copy && <SectionHeaderSlice section={copy} headerKey="projects"
+          {copy && <SectionHeaderSlice section={copy} headerKey="projects" onSaved={reload}
                                        title="Projects — section header" />}
           {projects
             ? <ArrayEditor sectionKey="projects" label="Project tiles" body={projects.body} onSaved={reload} />
@@ -317,7 +317,7 @@ function renderTab(tabKey: string, sections: Section[], reload: () => void): Rea
       const services = find(sections, 'services');
       return (
         <>
-          {copy && <SectionHeaderSlice section={copy} headerKey="services"
+          {copy && <SectionHeaderSlice section={copy} headerKey="services" onSaved={reload}
                                        title="Services — section header" />}
           {services
             ? <ArrayEditor sectionKey="services" label="Service cards" body={services.body} onSaved={reload} />
@@ -330,7 +330,7 @@ function renderTab(tabKey: string, sections: Section[], reload: () => void): Rea
       const testimonials = find(sections, 'testimonials');
       return (
         <>
-          {copy && <SectionHeaderSlice section={copy} headerKey="testimonials"
+          {copy && <SectionHeaderSlice section={copy} headerKey="testimonials" onSaved={reload}
                                        title="Testimonials — section header" />}
           {testimonials
             ? <ArrayEditor sectionKey="testimonials" label="Reviews" body={testimonials.body} onSaved={reload} />
@@ -344,9 +344,9 @@ function renderTab(tabKey: string, sections: Section[], reload: () => void): Rea
         <>
           {copy
             ? <>
-                <SectionHeaderSlice section={copy} headerKey="contact"
+                <SectionHeaderSlice section={copy} headerKey="contact" onSaved={reload}
                                     title="Contact — section header" />
-                <ContactBlockSlice section={copy} />
+                <ContactBlockSlice section={copy} onSaved={reload} />
               </>
             : <MissingRow name="copy" />}
         </>
@@ -354,7 +354,7 @@ function renderTab(tabKey: string, sections: Section[], reload: () => void): Rea
     }
     case 'footer': {
       const copy = find(sections, 'copy');
-      return copy ? <FooterSlice section={copy} /> : <MissingRow name="copy" />;
+      return copy ? <FooterSlice section={copy} onSaved={reload} /> : <MissingRow name="copy" />;
     }
     case 'legal': {
       const terms   = find(sections, 'legal.terms');
@@ -494,6 +494,12 @@ function NewSectionDialog({
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
+
   async function submit() {
     if (!/^[a-zA-Z0-9._-]+$/.test(key)) {
       setErr('Key must be alphanumeric (with . _ -). No spaces.'); return;
@@ -519,11 +525,14 @@ function NewSectionDialog({
       onClick={onClose}
     >
       <motion.div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="new-section-title"
         className="w-full max-w-md tier-3 ambient-float-lg p-6"
         initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 16, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="font-display text-lg tracking-tight">New CMS section</h2>
+        <h2 id="new-section-title" className="font-display text-lg tracking-tight">New CMS section</h2>
         <p className="mt-1 text-[11px] text-muted">
           The frontend reads this at <code>/api/portfolio/{'{key}'}</code>. Point a
           new <code>useSection</code> hook at the same key to render it.

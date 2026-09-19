@@ -44,10 +44,15 @@ export default function ArrayEditor({
   const [err, setErr]   = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
 
+  // Resync from the server body only when the content actually changed and
+  // there are no in-progress edits — a parent reload must not wipe them.
+  const bodyKey = JSON.stringify(body ?? null);
   useEffect(() => {
+    if (dirty) return;
     setItems(withIds(Array.isArray(body) ? (body as Record<string, unknown>[]) : []));
     setDirty(false);
-  }, [body]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bodyKey]);
 
   if (!schema) return null;
 
@@ -194,7 +199,7 @@ function CardRow({
   return (
     <>
       {/* Collapsed row */}
-      <div className="flex items-center gap-2 px-3 py-2.5 cursor-pointer select-none" onClick={onToggle}>
+      <div className="flex items-center gap-2 px-3 py-2.5 select-none">
         <span
           aria-hidden
           className="grid place-items-center text-ink-soft hover:text-ink cursor-grab active:cursor-grabbing pl-1"
@@ -202,8 +207,15 @@ function CardRow({
         >
           <GripVertical size={15} />
         </span>
-        <span className="text-[10.5px] font-num text-muted w-6 tabular-nums">{String(idx + 1).padStart(2, '0')}</span>
-        <span className="flex-1 truncate text-sm font-medium text-ink">{schema.cardTitle(item) || `Untitled ${schema.itemLabel.toLowerCase()}`}</span>
+        <button
+          type="button"
+          aria-expanded={open}
+          onClick={onToggle}
+          className="flex-1 min-w-0 flex items-center gap-2 text-left bg-transparent cursor-pointer"
+        >
+          <span className="text-[10.5px] font-num text-muted w-6 tabular-nums">{String(idx + 1).padStart(2, '0')}</span>
+          <span className="flex-1 truncate text-sm font-medium text-ink">{schema.cardTitle(item) || `Untitled ${schema.itemLabel.toLowerCase()}`}</span>
+        </button>
         <button
           type="button"
           onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
@@ -218,7 +230,7 @@ function CardRow({
           title="Delete"
           aria-label="Delete"
         ><Trash2 size={13} /></button>
-        <motion.span animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
+        <motion.span aria-hidden animate={{ rotate: open ? 180 : 0 }} transition={{ duration: 0.2 }}>
           <ChevronDown size={14} className="text-ink-soft" />
         </motion.span>
       </div>
@@ -312,12 +324,12 @@ function Field({ schema, value, onChange }: {
     case 'csv-tags': {
       const arr = Array.isArray(value) ? (value as string[]) : [];
       control = (
-        <input
-          value={arr.join(', ')}
+        <DelimitedInput
+          values={arr}
+          delimiter=","
+          joiner=", "
           placeholder={schema.placeholder}
-          onChange={(e) =>
-            onChange(e.target.value.split(',').map((s) => s.trim()).filter(Boolean))
-          }
+          onChange={onChange}
           className={inputCls}
         />
       ); break;
@@ -325,13 +337,14 @@ function Field({ schema, value, onChange }: {
     case 'pipe-list': {
       const arr = Array.isArray(value) ? (value as string[]) : [];
       control = (
-        <textarea
+        <DelimitedInput
+          multiline
           rows={schema.rows ?? 3}
-          value={arr.join(' | ')}
+          values={arr}
+          delimiter="|"
+          joiner=" | "
           placeholder={schema.placeholder}
-          onChange={(e) =>
-            onChange(e.target.value.split('|').map((s) => s.trim()).filter(Boolean))
-          }
+          onChange={onChange}
           className={inputCls}
         />
       ); break;
@@ -340,6 +353,8 @@ function Field({ schema, value, onChange }: {
       control = (
         <button
           type="button"
+          role="switch"
+          aria-checked={Boolean(value)}
           onClick={() => onChange(!value)}
           className={`w-full inline-flex items-center gap-3 px-3 py-2 rounded-xl transition ${
             value ? 'bg-green-50 ring-1 ring-primary/40' : 'surface-low ghost-line hover:bg-surface-container'
@@ -375,6 +390,50 @@ function Field({ schema, value, onChange }: {
       {schema.hint && <p className="mt-1 text-[11px] text-muted">{schema.hint}</p>}
     </label>
   );
+}
+
+/* ---------- Delimited list input ----------
+ * Keeps a local string while typing so separators don't vanish on every
+ * keystroke; parses into string[] on blur; resyncs from the incoming array
+ * when it changes and the control is not focused. */
+
+function DelimitedInput({
+  values, delimiter, joiner, onChange, placeholder, className, multiline = false, rows,
+}: {
+  values: string[];
+  delimiter: string;
+  joiner: string;
+  onChange: (v: string[]) => void;
+  placeholder?: string;
+  className?: string;
+  multiline?: boolean;
+  rows?: number;
+}) {
+  const joined = values.join(joiner);
+  const [text, setText] = useState(joined);
+  const [focused, setFocused] = useState(false);
+
+  useEffect(() => {
+    if (!focused) setText(joined);
+  }, [joined, focused]);
+
+  function commit() {
+    setFocused(false);
+    const parsed = text.split(delimiter).map((s) => s.trim()).filter(Boolean);
+    if (parsed.join(joiner) !== joined) onChange(parsed);
+    setText(parsed.join(joiner));
+  }
+
+  const common = {
+    value: text,
+    placeholder,
+    className,
+    onFocus: () => setFocused(true),
+    onBlur: commit,
+  };
+  return multiline
+    ? <textarea rows={rows} {...common} onChange={(e) => setText(e.target.value)} />
+    : <input {...common} onChange={(e) => setText(e.target.value)} />;
 }
 
 /* ---------- Helpers ---------- */

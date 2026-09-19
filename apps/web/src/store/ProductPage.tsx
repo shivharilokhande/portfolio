@@ -12,6 +12,7 @@ import {
 import { store, type ProductDto } from './storeApi';
 import { useCart, formatMoney } from './cartStore';
 import { onStoreChanged } from '../lib/portfolioBus';
+import { assetUrl } from '../lib/api';
 
 const POLL_MS = 30_000;
 
@@ -206,7 +207,7 @@ function ProductHero({ product: p }: { product: ProductDto }) {
           <AnimatePresence mode="wait">
             <motion.img
               key={current}
-              src={current ?? ''}
+              src={current ? assetUrl(current) : ''}
               alt={`${p.title} — screenshot ${active + 1}`}
               className="absolute inset-0 w-full h-full object-cover"
               loading="eager"
@@ -248,7 +249,7 @@ function ProductHero({ product: p }: { product: ProductDto }) {
                   : 'opacity-70 hover:opacity-100 ghost-line'
               }`}
             >
-              <img src={url} alt="" className="w-full h-full object-cover" loading="lazy" />
+              <img src={assetUrl(url)} alt="" className="w-full h-full object-cover" loading="lazy" />
             </button>
           ))}
         </div>

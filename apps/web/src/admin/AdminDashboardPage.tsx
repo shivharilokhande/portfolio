@@ -499,6 +499,7 @@ function buildActivity(orders: AdminOrder[] | null, contacts: AdminContact[] | n
   const out: Activity[] = [];
   if (orders) {
     for (const o of orders) {
+      if (!o.createdAt) continue;   // no real timestamp — don't fabricate one
       out.push({
         id: `o-${o.id}`,
         kind: 'order',
@@ -507,7 +508,7 @@ function buildActivity(orders: AdminOrder[] | null, contacts: AdminContact[] | n
         status: o.status,
         amount: o.total,
         currency: o.currency,
-        when: new Date(Date.now() - (1000 * 60 * (o.id % 60))).toISOString(),
+        when: o.createdAt,
         initial: '#',
       });
     }
@@ -542,8 +543,8 @@ function buildSparks(orders: AdminOrder[] | null, contacts: AdminContact[] | nul
 
   if (orders) {
     for (const o of orders) {
-      const synthetic = new Date(Date.now() - (1000 * 60 * 60 * 24 * (o.id % days))).toISOString();
-      const idx = dayIndex(synthetic);
+      if (!o.createdAt) continue;   // skip orders without a real timestamp
+      const idx = dayIndex(o.createdAt);
       if (idx >= 0) {
         sOrders[idx] += 1;
         if (o.status === 'PAID' && o.currency === 'INR') sRevenue[idx] += Number(o.total);

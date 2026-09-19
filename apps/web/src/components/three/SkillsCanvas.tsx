@@ -2,7 +2,13 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Html, OrbitControls, Sparkles, Float } from '@react-three/drei';
 import { useMemo, useRef, useState, useEffect } from 'react';
 import * as THREE from 'three';
-import { skillCategories } from '../../lib/data';
+import { skillCategories as defaultSkillCategories } from '../../lib/data';
+
+export type SkillCategory = {
+  label: string;
+  color: string;
+  skills: { name: string; level: number }[];
+};
 
 /**
  * Skills 3D — next-gen premium cluster.
@@ -214,7 +220,7 @@ function GuideRing({ tilt, speed, color = '#00d166' }: { tilt: [number, number, 
 
 /* ─────────────────────────  Cluster  ───────────────────────── */
 
-function Cluster() {
+function Cluster({ categories }: { categories: SkillCategory[] }) {
   const ref = useRef<THREE.Group>(null);
   useFrame((_, dt) => {
     if (!ref.current) return;
@@ -225,7 +231,7 @@ function Cluster() {
 
   const nodes = useMemo<NodeProps[]>(() => {
     const out: NodeProps[] = [];
-    const all = skillCategories.flatMap((c) => c.skills.map((s) => ({ ...s, color: c.color })));
+    const all = categories.flatMap((c) => c.skills.map((s) => ({ ...s, color: c.color })));
     const n = all.length;
     const phi = Math.PI * (3 - Math.sqrt(5));
     all.forEach((s, i) => {
@@ -244,7 +250,7 @@ function Cluster() {
       });
     });
     return out;
-  }, []);
+  }, [categories]);
 
   return (
     <group ref={ref}>
@@ -272,7 +278,7 @@ function Cluster() {
 
 /* ─────────────────────────  Canvas  ───────────────────────── */
 
-export default function SkillsCanvas() {
+export default function SkillsCanvas({ categories = defaultSkillCategories }: { categories?: SkillCategory[] }) {
   useScrollVelocity();
   return (
     <Canvas
@@ -293,7 +299,7 @@ export default function SkillsCanvas() {
 
       {/* Wrap the cluster in Float for a gentle overall drift. */}
       <Float speed={0.6} rotationIntensity={0.15} floatIntensity={0.3}>
-        <Cluster />
+        <Cluster categories={categories} />
       </Float>
 
       <OrbitControls enableZoom={false} enablePan={false} autoRotate={false} />

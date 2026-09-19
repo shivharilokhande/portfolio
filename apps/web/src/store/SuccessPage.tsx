@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { profile as staticProfile } from '../lib/data';
 import { useSection } from '../hooks/usePortfolioContent';
 import { useBrand } from '../components/BrandLogo';
+import { useCart } from './cartStore';
 
 /**
  * SuccessPage — landing after Razorpay/Stripe payment succeeds.
@@ -24,13 +25,21 @@ const POLL_TIMEOUT_MS  = 3 * 60_000;  // 3 minutes — beyond that we assume the
                                        // webhook is delayed and let the buyer
                                        // fall back to the email link.
 
+function readStoredEmail(): string | null {
+  try { return sessionStorage.getItem('checkout.email'); } catch { return null; }
+}
+
 export default function SuccessPage() {
   const { orderId } = useParams<{ orderId: string }>();
   const [params] = useSearchParams();
   // The mock path used to pass ?token= directly; keep that as a fast-path for
   // any legacy flows that still work that way.
-  const legacyToken = params.get('token');
-  const email       = params.get('email');
+  // Stripe's success_url passes ?token={CHECKOUT_SESSION_ID} (cs_…) — that is
+  // NOT a download token, so ignore it here.
+  const rawToken    = params.get('token');
+  const legacyToken = rawToken && !rawToken.startsWith('cs_') ? rawToken : null;
+  const email       = params.get('email') ?? readStoredEmail();
+  const clearCart   = useCart((s) => s.clear);
   const profile = useSection<typeof staticProfile>('profile', staticProfile);
   const brand   = useBrand();
 
@@ -85,6 +94,11 @@ export default function SuccessPage() {
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Once the order is confirmed paid, the cart is spent — clear it.
+  useEffect(() => {
+    if (pollingState.kind === 'ready') clearCart();
+  }, [pollingState.kind, clearCart]);
 
   const secondsElapsed = useMemo(() => {
     if (pollingState.kind !== 'polling') return 0;
