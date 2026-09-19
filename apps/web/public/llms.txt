@@ -21,3 +21,8 @@
 - Phone: +91 95189 56711
 
 Full version with FAQ and page index: https://shivhari.tech/llms-full.txt
+
+## Service pages
+- https://shivhari.tech/services/workiva-consultant — Workiva consultant: Wdesk, Wdata, DataPrep, API integrations
+- https://shivhari.tech/services/fractional-cto — Fractional CTO / tech lead for US teams on India hours
+- https://shivhari.tech/services/scrum-master — Freelance Scrum Master / delivery lead for offshore-onshore teams

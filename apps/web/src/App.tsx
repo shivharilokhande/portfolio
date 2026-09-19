@@ -14,6 +14,7 @@ const SuccessPage    = lazy(() => import('./store/SuccessPage'));
 const DownloadsPage  = lazy(() => import('./store/DownloadsPage'));
 const NotFoundPage   = lazy(() => import('./pages/NotFoundPage'));
 const LegalPage      = lazy(() => import('./pages/LegalPage'));
+const ServicePage    = lazy(() => import('./pages/ServicePage'));
 
 const AdminLayout            = lazy(() => import('./admin/AdminLayout'));
 const AdminLoginPage         = lazy(() => import('./admin/AdminLoginPage'));
@@ -62,6 +63,9 @@ export default function App() {
             legal.privacy / legal.refund, edited under /admin/portfolio →
             Legal. */}
         <Route path="/legal/:slug" element={<LegalPage />} />
+
+        {/* Service landing pages — one indexable URL per buyer keyword. */}
+        <Route path="/services/:slug" element={<ServicePage />} />
 
         {/* Store */}
         <Route path="/store" element={<StoreLayout />}>

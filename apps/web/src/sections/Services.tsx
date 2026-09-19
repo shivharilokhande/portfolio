@@ -9,6 +9,7 @@ import {
   Check, Sparkles, ShieldCheck, Clock, Award, BadgeCheck,
   Layers, Briefcase, Compass, Code2,
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import SectionHeader from '../components/SectionHeader';
 import { services as staticServices, type Service } from '../lib/data';
 import { useSection } from '../hooks/usePortfolioContent';
@@ -27,6 +28,13 @@ const accentRing: Record<Service['accent'], string> = {
   brand2:  'rgb(var(--secondary))',
   accent:  'rgb(var(--primary-soft))',
   emerald: '#10b981',
+};
+
+/** Service card → dedicated landing page (SEO). Keys match Service.name. */
+const pageFor: Record<string, string> = {
+  'Workiva Expert': '/services/workiva-consultant',
+  'Tech Lead':      '/services/fractional-cto',
+  'Scrum Master':   '/services/scrum-master',
 };
 
 const iconFor: Record<string, React.ReactNode> = {
@@ -145,6 +153,15 @@ export default function Services() {
                       <ShieldCheck size={12} className="text-primary" />
                       Free 30-min discovery call · scope &amp; pricing on the call
                     </p>
+                    {pageFor[s.name] && (
+                      <Link
+                        to={pageFor[s.name]}
+                        className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline min-h-[36px]"
+                        aria-label={`Read more about ${s.name} services`}
+                      >
+                        How this engagement works →
+                      </Link>
+                    )}
                   </div>
                 </div>
               </motion.article>

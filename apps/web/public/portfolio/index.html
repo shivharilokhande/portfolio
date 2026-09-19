@@ -509,7 +509,7 @@ footer{position:relative;z-index:2;display:flex;justify-content:space-between;fl
       </svg>
       <div class="years" id="years"></div>
     </div>
-    <div class="fan" id="cards">
+    <div class="fan" id="cards" tabindex="0" role="region" aria-label="Career timeline cards — use arrow keys or drag to rotate">
     <div class="ring-floor"></div>
     <article class="card reveal" data-year="2017" style="--ang:0.000deg"><div class="thumb" data-k="01"><i></i></div><div class="yl">2017</div><h3>Beginning</h3><p>B.Tech in Computer Science &amp; Engineering begins, full-time, at G.H. Raisoni College of Engineering and Management.</p><div class="org">Pune University</div></article>
     <article class="card reveal" data-year="2020" style="--ang:51.429deg"><div class="thumb" data-k="02"><i></i></div><div class="yl">2020</div><h3>Research Engineer</h3><p>Led five interns at IIT Bombay on a secure wastewater-treatment analysis platform in Java and Spring Boot for a Central Government project. First team, first plan.</p><div class="org">IIT Bombay · Jan 2020 – Jun 2021</div></article>
@@ -673,6 +673,7 @@ yl.addEventListener('pointerover',e=>{const el=e.target.closest('.yr');if(el){ho
 yl.addEventListener('pointerleave',()=>{hoverT=null});
 yl.addEventListener('click',e=>{const el=e.target.closest('.yr');if(el){const i=[...yl.children].indexOf(el);dragOff=0;pinT=i;}});
 let pinT=null;addEventListener('scroll',()=>{pinT=null},{passive:true});
+fan.addEventListener('keydown',e=>{if(e.key!=='ArrowRight'&&e.key!=='ArrowLeft')return;e.preventDefault();const cur=pinT!=null?pinT:Math.round(curSmooth||0);pinT=Math.max(0,Math.min(years.length-1,cur+(e.key==='ArrowRight'?1:-1)));dragOff=0;lastY=-1});
 tlStage.addEventListener('pointerdown',e=>{if(innerWidth<901)return;dragX=e.clientX;dragStart=dragOff;tlStage.classList.add('dragging','dragged');tlStage.setPointerCapture(e.pointerId)});
 tlStage.addEventListener('pointermove',e=>{if(dragX===null)return;dragOff=dragStart+(e.clientX-dragX)*.35;lastY=-1});
 cardEls.forEach((c,i)=>c.addEventListener('click',()=>{if(Math.abs(dragOff-dragStart)<2){pinT=i;dragOff=0;lastY=-1}}));

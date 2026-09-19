@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Menu, X, ShoppingBag, ArrowUpRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import { profile as staticProfile } from '../lib/data';
 import { useSection } from '../hooks/usePortfolioContent';
 import { assetUrl, warmApi } from '../lib/api';
@@ -25,6 +25,10 @@ const links: NavLink[] = [
 ];
 
 function LinkItem({ l, onClick, mobile = false }: { l: NavLink; onClick?: () => void; mobile?: boolean }) {
+  const { pathname } = useLocation();
+  // Route-level "current page" for assistive tech (hash sections handled by scroll spy elsewhere).
+  const routePath = l.href.split('#')[0];
+  const current = routePath !== '/' && routePath !== '' && pathname.startsWith(routePath.replace(/\/$/, '')) ? 'page' as const : undefined;
   // Mobile rows are full-width, 44px-tall tap targets; desktop keeps the compact pill.
   const cls = mobile
     ? 'flex items-center min-h-[44px] px-3 py-2 rounded-lg text-base text-ink-soft hover:text-ink hover:bg-surface-low/70 transition'
@@ -34,12 +38,12 @@ function LinkItem({ l, onClick, mobile = false }: { l: NavLink; onClick?: () => 
     // waking the backend before the click so the catalog loads live sooner.
     const warm = l.id === 'store' ? warmApi : undefined;
     return (
-      <Link to={l.href} onClick={onClick} onPointerEnter={warm} onFocus={warm} className={cls}>
+      <Link to={l.href} onClick={onClick} onPointerEnter={warm} onFocus={warm} className={cls} aria-current={current}>
         {l.label}
       </Link>
     );
   }
-  return <a href={l.href} onClick={onClick} className={cls}>{l.label}</a>;
+  return <a href={l.href} onClick={onClick} className={cls} aria-current={current}>{l.label}</a>;
 }
 
 /** Whether a profile.cvUrl value should render as a live download link.

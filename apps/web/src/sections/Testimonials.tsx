@@ -47,7 +47,11 @@ export default function Testimonials() {
               }`}
             >
               {/* product chip */}
-              <Link to="/store" className="chip-resource text-primary hover:bg-surface-container transition">
+              <Link
+                to="/store"
+                tabIndex={i >= testimonials.length ? -1 : undefined}
+                className="chip-resource text-primary hover:bg-surface-container transition"
+              >
                 <ShoppingBag size={11} /> {t.product}
               </Link>
 

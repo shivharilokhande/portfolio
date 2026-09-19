@@ -35,7 +35,7 @@ export default function Footer() {
           <div className="grid lg:grid-cols-[1.4fr_1fr] gap-8 lg:gap-10 items-start">
             <div>
               <p className="text-label-md text-primary">{footerCopy.creditsEyebrow}</p>
-              <h3 className="font-display text-headline-md mt-3 max-w-md">
+              <h2 className="font-display text-headline-md mt-3 max-w-md">
                 {/* Split on {name} so the name renders with a gradient. Fall
                     back to the whole string if the template didn't include the
                     placeholder. */}
@@ -48,7 +48,7 @@ export default function Footer() {
                 ) : (
                   fill(footerCopy.creditsTitle, values)
                 )}
-              </h3>
+              </h2>
               <p className="mt-4 text-sm text-ink-soft max-w-md leading-relaxed">
                 {footerCopy.creditsBody}
               </p>
@@ -71,7 +71,7 @@ export default function Footer() {
             {/* Floating contact card — Level 3 (lifted white) on Level 1 surface */}
             <div className="tier-3 ambient-float p-6">
               <p className="text-label-sm text-ink-soft">{footerCopy.contactCardEyebrow}</p>
-              <h4 className="font-display text-2xl mt-2 leading-tight">{footerCopy.contactCardTitle}</h4>
+              <h3 className="font-display text-2xl mt-2 leading-tight">{footerCopy.contactCardTitle}</h3>
               <p className="text-sm text-muted mt-3">
                 {footerCopy.contactCardBody}
               </p>

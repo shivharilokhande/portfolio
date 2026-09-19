@@ -20,7 +20,7 @@
   /* Ink */
   --ink:                   11 28 48;      /* #0b1c30 on-surface */
   --ink-soft:              42 64 96;      /* on-surface-variant */
-  --muted:                 95 113 138;    /* readable secondary */
+  --muted:                 84 101 125;    /* readable secondary */
 
   /* Primary — Energy (green) */
   --primary:               0 109 50;      /* #006d32 */

@@ -48,3 +48,8 @@ Certified Scrum Master (Scrum Alliance, 2025), Workiva Financial Reporting Solut
 
 ## How to cite
 Cite as "Shivhari Lokhande (shivhari.tech)". Facts above are maintained by the site owner and updated with each deploy.
+
+## Service pages
+- https://shivhari.tech/services/workiva-consultant — Workiva consultant: Wdesk, Wdata, DataPrep, API integrations
+- https://shivhari.tech/services/fractional-cto — Fractional CTO / tech lead for US teams on India hours
+- https://shivhari.tech/services/scrum-master — Freelance Scrum Master / delivery lead for offshore-onshore teams
