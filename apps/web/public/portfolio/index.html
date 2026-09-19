@@ -403,6 +403,41 @@ html.js:not(.still):not(.vid) #home{height:100vh}
 .crow:hover .arr{background:var(--bone);color:#3a0510;transform:rotate(45deg)}
 footer{position:relative;z-index:2;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;max-width:1300px;margin:0 auto;padding-block:20px 30px;font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:rgba(239,228,216,.55)}
 @media (max-width:900px){.contact-in{grid-template-columns:1fr;padding-top:200px}.badge,.badge-dot{top:90px;right:16px}}
+
+/* ---- phone (≤600px): calm, vertical, one idea per screen ---- */
+@media (max-width:600px){
+ /* Skills: grid of tiles on the dark panel — no photo, no side copy */
+ #universe{padding-block:90px 60px}
+ #universe .bg{display:none}
+ .uni-field{gap:10px;padding:8px 0 24px}
+ .tile{--w:88px!important;border-radius:14px}
+ /* Journey: vertical timeline instead of arc + sideways scroller */
+ #journey{padding-block:90px 0}
+ .arc,.tl-floor,.tl-glow,#journey canvas{display:none}
+ .tl-head{gap:10px;margin-bottom:8px}
+ .fan{display:grid;grid-auto-flow:row;grid-template-columns:1fr;gap:14px;overflow:visible;padding:8px 0 48px 26px;position:relative}
+ .fan::before{content:"";position:absolute;left:7px;top:6px;bottom:48px;width:1px;background:linear-gradient(180deg,var(--gold),rgba(214,169,85,.12))}
+ .card,.card.on{width:auto;margin:0;padding:16px 16px 18px}
+ .card::after{content:"";position:absolute;left:-24px;top:22px;width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px rgba(214,169,85,.15),0 0 14px var(--gold)}
+ .card .thumb{display:none}
+ .card .yl{font-size:1.5rem}
+ .card h3{font-size:.62rem}
+ .card p{font-size:.8rem;line-height:1.5}
+ /* Work: cards only, tighter */
+ #work{padding-block:80px 50px}
+ #work::before{display:none}
+ .stage{margin-top:28px;gap:14px}
+ .stage .center{display:none}
+ .pcard{padding:18px 16px 16px}
+ .pcard h3{font-size:1.35rem}
+ .pcard p{font-size:.84rem}
+ .pcard .stats{gap:12px 18px;margin-top:12px}
+ .pcard .stats b{font-size:1.25rem}
+ .pcard .stack{margin-top:12px}
+ /* About / Contact breathing room */
+ #about{padding-block:70px 70px}
+ .contact-in{padding-top:150px}
+}
 </style></head><body>
 
 <a href="#main" class="skip" style="position:absolute;left:-999px;top:8px;z-index:100;background:var(--bone);color:#111;padding:8px 12px;border-radius:4px" onfocus="this.style.left='8px'" onblur="this.style.left='-999px'">Skip to content</a>
