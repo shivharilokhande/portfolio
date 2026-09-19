@@ -160,7 +160,7 @@ export default function Skills() {
             animate={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-7 relative tier-3 ambient-float-lg overflow-hidden h-[480px] sm:h-[540px]"
+            className="lg:col-span-7 relative tier-3 ambient-float-lg overflow-hidden h-[min(480px,62svh)] sm:h-[540px]"
           >
             <div className="absolute top-4 left-4 z-10 chip-status-active">
               <span className="dot-live" /> live · cluster
@@ -180,7 +180,7 @@ export default function Skills() {
               )}
             </div>
 
-            <div className="absolute bottom-4 left-4 right-4 z-10 flex items-center justify-between text-label-sm text-muted pointer-events-none">
+            <div className="absolute bottom-4 left-4 right-4 z-10 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-label-sm text-muted pointer-events-none">
               <span>Drag · hover · explore</span>
               <span className="font-num">{totalSkills} skills · {skillCategories.length} pillars</span>
             </div>
@@ -232,7 +232,7 @@ export default function Skills() {
           initial="hidden"
           animate="show"
           viewport={{ once: true, amount: 0.15 }}
-          className="mt-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5"
+          className="mt-8 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5"
         >
           {skillCategories.map((c, i) => {
             const a = avg(c.skills);

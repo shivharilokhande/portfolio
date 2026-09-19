@@ -16,10 +16,11 @@ import { useTilt } from '../hooks/useTilt';
 type Span = ProjectTile['span'];
 
 const spanClass: Record<Span, string> = {
-  lg:   'md:col-span-2 lg:col-span-2 lg:row-span-2',
-  wide: 'md:col-span-2 lg:col-span-2',
-  tall: 'md:col-span-1 lg:col-span-1 lg:row-span-2',
-  sm:   'md:col-span-1 lg:col-span-1',
+  // Four-column bento only from xl (1280); at 1024 a 1-col tile is ~220px wide.
+  lg:   'md:col-span-2 xl:col-span-2 xl:row-span-2',
+  wide: 'md:col-span-2 xl:col-span-2',
+  tall: 'md:col-span-1 xl:col-span-1 xl:row-span-2',
+  sm:   'md:col-span-1 xl:col-span-1',
 };
 
 function ProjectTileView({ p, idx }: { p: ProjectTile; idx: number }) {
@@ -71,8 +72,8 @@ function ProjectTileView({ p, idx }: { p: ProjectTile; idx: number }) {
             {p.blurb}
           </p>
 
-          <div className="mt-auto pt-5 flex items-end justify-between gap-3">
-            <ul className="flex flex-wrap gap-1.5">
+          <div className="mt-auto pt-5 flex items-end justify-between gap-3 min-w-0">
+            <ul className="flex flex-wrap gap-1.5 min-w-0">
               {p.stack.slice(0, isHero ? 6 : 4).map((s) => (
                 <li key={s} className="chip-resource text-[10.5px] py-0.5">
                   {s}
@@ -152,7 +153,7 @@ export default function Projects() {
 
         <div
           role="list"
-          className="mt-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 auto-rows-[minmax(220px,auto)]"
+          className="mt-14 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 auto-rows-[minmax(220px,auto)]"
         >
           {projects.map((p, i) => <ProjectTileView key={p.id} p={p} idx={i} />)}
         </div>

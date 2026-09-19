@@ -50,25 +50,28 @@ export default function CartPage() {
                   initial={false}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.96 }}
-                  className={`${idx % 2 === 0 ? 'tier-3' : 'tier-1'} ambient-float p-5 flex gap-4 items-center`}
+                  /* Phone: thumb + title on row one, qty / line total / remove
+                     on a full-width row two. From sm everything sits on one row. */
+                  className={`${idx % 2 === 0 ? 'tier-3' : 'tier-1'} ambient-float p-4 sm:p-5 flex flex-wrap sm:flex-nowrap gap-3 sm:gap-4 items-center`}
                 >
                   <div
-                    className="w-16 h-16 rounded-xl shrink-0 grid place-items-center font-display font-semibold text-2xl text-ink/40"
+                    className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl shrink-0 grid place-items-center font-display font-semibold text-2xl text-ink/40"
                     style={{ background: `radial-gradient(circle at 30% 30%, ${l.coverColor}99, transparent 70%)` }}
                   >
                     {l.title.slice(0, 1)}
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 basis-[calc(100%-4.25rem)] sm:basis-auto">
                     <Link to={`/store/${l.slug}`} className="font-semibold text-ink hover:text-primary transition truncate block">
                       {l.title}
                     </Link>
                     <p className="text-xs text-ink-soft mt-0.5">Unit · {formatMoney(unit, currency)}</p>
                   </div>
+                  <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto justify-between sm:justify-end">
                   <div className="flex items-center gap-1 surface-low ghost-line rounded-lg">
                     <button
                       aria-label="decrease"
                       onClick={() => setQuantity(l.productId, l.quantity - 1)}
-                      className="p-2 hover:bg-surface-container transition rounded-l-lg"
+                      className="w-10 h-10 grid place-items-center hover:bg-surface-container transition rounded-l-lg"
                     ><Minus size={13} /></button>
                     <span className="w-6 text-center text-sm font-num tabular-nums text-ink">{l.quantity}</span>
                     <button
@@ -78,17 +81,18 @@ export default function CartPage() {
                       // just 400 at checkout with no UX explanation.
                       onClick={() => setQuantity(l.productId, Math.min(20, l.quantity + 1))}
                       disabled={l.quantity >= 20}
-                      className="p-2 hover:bg-surface-container transition rounded-r-lg disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-10 h-10 grid place-items-center hover:bg-surface-container transition rounded-r-lg disabled:opacity-40 disabled:cursor-not-allowed"
                     ><Plus size={13} /></button>
                   </div>
-                  <div className="hidden sm:block w-24 text-right font-num text-sm text-ink">
+                  <div className="sm:w-24 text-right font-num text-sm text-ink">
                     {formatMoney(lineTotal, currency)}
                   </div>
                   <button
                     aria-label="remove"
                     onClick={() => remove(l.productId)}
-                    className="p-2 rounded-lg text-ink-soft hover:text-red-700 hover:bg-red-50 transition"
+                    className="w-10 h-10 grid place-items-center rounded-lg text-ink-soft hover:text-red-700 hover:bg-red-50 transition"
                   ><X size={15} /></button>
+                  </div>
                 </motion.li>
               );
             })}

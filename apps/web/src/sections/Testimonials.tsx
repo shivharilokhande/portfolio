@@ -28,8 +28,8 @@ export default function Testimonials() {
 
       <div className="mt-14 relative group">
         {/* edge fades — tonal, not hard cuts */}
-        <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
-        <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-y-0 left-0 w-10 sm:w-24 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-10 sm:w-24 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
 
         {/* CSS keyframe marquee on a duplicated track: hover really pauses
             (play-state is CSS-owned), and prefers-reduced-motion falls back
@@ -42,7 +42,7 @@ export default function Testimonials() {
             <article
               key={i}
               aria-hidden={i >= testimonials.length || undefined}
-              className={`w-[320px] sm:w-[440px] shrink-0 ambient-float p-7 relative overflow-hidden ${
+              className={`w-[min(320px,calc(100vw-3rem))] sm:w-[440px] shrink-0 ambient-float p-6 sm:p-7 relative overflow-hidden ${
                 i % 2 === 0 ? 'tier-3' : 'tier-1'
               }`}
             >

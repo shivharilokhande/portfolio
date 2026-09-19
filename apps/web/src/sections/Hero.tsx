@@ -84,7 +84,7 @@ export default function Hero() {
   const heroFade = useTransform(scrollYProgress, [0, 0.7, 1], [1, 0.7, 0]);
 
   return (
-    <section ref={sectionRef} id="top" className="relative min-h-[100svh] flex items-center pt-24 pb-20">
+    <section ref={sectionRef} id="top" className="relative min-h-[100svh] flex items-center pt-24 pb-16 sm:pb-20 overflow-x-hidden">
       {/* Soft primary aurora — sets the energy of the room without dominating */}
       <div className="aurora bg-[radial-gradient(circle_at_18%_30%,rgba(0,209,102,0.18),transparent_60%),radial-gradient(circle_at_82%_70%,rgba(10,92,207,0.10),transparent_55%)]" />
 
@@ -97,15 +97,15 @@ export default function Hero() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: easeOut }}
-              className="chip-resource chip-resource-lg"
+              className="chip-resource chip-resource-lg max-w-full whitespace-normal text-left"
             >
               <span className="dot-live" />
               {badgeText}
             </motion.span>
 
-            <h1 className={`mt-7 font-display ${headlineSize} max-w-5xl text-ink`}>
+            <h1 className={`mt-6 sm:mt-7 font-display ${headlineSize} max-w-5xl text-ink`}>
               {headlineWords.map((w, i) => (
-                <span key={i} className="inline-block overflow-hidden align-bottom mr-3 pb-1">
+                <span key={i} className="inline-block overflow-hidden align-bottom mr-2 sm:mr-3 pb-1">
                   <motion.span
                     initial={{ y: '110%', opacity: 0 }}
                     animate={{ y: '0%', opacity: 1 }}
@@ -138,7 +138,7 @@ export default function Hero() {
               animate="show"
               transition={{ delay: 1.05, staggerChildren: 0.08 }}
               variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
-              className="mt-10 flex flex-wrap gap-3"
+              className="mt-8 sm:mt-10 flex flex-wrap gap-3 [&>a]:min-h-[44px]"
             >
               <motion.a
                 variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
@@ -185,7 +185,7 @@ export default function Hero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 1.4 }}
-              className="mt-14 flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-muted font-mono"
+              className="mt-10 sm:mt-14 flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-muted font-mono"
             >
               <span className="inline-flex items-center gap-2">
                 <Sparkles size={12} className="text-primary" />
@@ -220,10 +220,10 @@ export default function Hero() {
               </p>
 
               {/* Stats — array-driven so admins can add/remove tiles */}
-              <div className="mt-8 grid grid-cols-3 gap-4">
+              <div className="mt-8 grid grid-cols-3 gap-3 xl:gap-4">
                 {heroCard.stats.slice(0, 3).map(({ n, l }, i) => (
                   <div key={`${l}-${i}`} className="tier-1 p-3 text-left">
-                    <p className="font-num font-semibold text-2xl text-ink leading-none">{n}</p>
+                    <p className="font-num font-semibold text-xl xl:text-2xl text-ink leading-none break-anywhere">{n}</p>
                     <p className="text-[10px] text-muted tracking-[0.14em] uppercase mt-2">{l}</p>
                   </div>
                 ))}

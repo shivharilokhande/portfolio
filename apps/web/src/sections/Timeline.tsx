@@ -36,13 +36,13 @@ export default function Timeline() {
 
         <div ref={ref} className="relative mt-20">
           {/* Spine — outline-variant ghost line under, primary gradient growing */}
-          <div className="absolute left-4 sm:left-1/2 top-0 -translate-x-1/2 w-px h-full bg-outline-variant/20" />
+          <div className="absolute left-4 md:left-1/2 top-0 -translate-x-1/2 w-px h-full bg-outline-variant/20" />
           <motion.div
             style={{ height: spineHeight }}
-            className="absolute left-4 sm:left-1/2 top-0 -translate-x-1/2 w-px bg-gradient-to-b from-primary to-primary-soft"
+            className="absolute left-4 md:left-1/2 top-0 -translate-x-1/2 w-px bg-gradient-to-b from-primary to-primary-soft"
           />
 
-          <ol className="space-y-14 sm:space-y-20">
+          <ol className="space-y-14 md:space-y-20">
             {timeline.map((t, i) => {
               const left = i % 2 === 0;
               const chapter = String(timeline.length - i).padStart(2, '0');
@@ -53,10 +53,10 @@ export default function Timeline() {
                   animate={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.35 }}
                   transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                  className={`relative sm:grid sm:grid-cols-2 sm:gap-12 ${left ? '' : 'sm:[&>*:first-child]:order-2'}`}
+                  className={`relative md:grid md:grid-cols-2 md:gap-12 ${left ? '' : 'md:[&>*:first-child]:order-2'}`}
                 >
                   {/* Spine dot — primary, ringed with the page bg to "punch through" the spine */}
-                  <span className="absolute left-4 sm:left-1/2 -translate-x-1/2 top-3 w-3.5 h-3.5 rounded-full bg-gradient-to-br from-primary to-primary-soft ring-4 ring-bg ambient-float" />
+                  <span className="absolute left-4 md:left-1/2 -translate-x-1/2 top-3 w-3.5 h-3.5 rounded-full bg-gradient-to-br from-primary to-primary-soft ring-4 ring-bg ambient-float" />
 
                   {/* META — chapter number, role, company */}
                   <motion.div
@@ -64,9 +64,9 @@ export default function Timeline() {
                     animate={{ opacity: 1, x: 0 }}
                     viewport={{ once: true, amount: 0.35 }}
                     transition={{ duration: 0.55, delay: 0.05 }}
-                    className={`ml-12 sm:ml-0 ${left ? 'sm:pr-12 sm:text-right' : 'sm:pl-12'}`}
+                    className={`ml-10 sm:ml-12 md:ml-0 ${left ? 'md:pr-12 md:text-right' : 'md:pl-12'}`}
                   >
-                    <div className={`flex items-center gap-3 ${left ? 'sm:justify-end' : ''}`}>
+                    <div className={`flex items-center gap-3 ${left ? 'md:justify-end' : ''}`}>
                       <span className="text-label-sm text-muted">Chapter</span>
                       <span className="font-num font-semibold text-4xl text-gradient leading-none tracking-tight">
                         {chapter}
@@ -78,7 +78,7 @@ export default function Timeline() {
                     <p className="mt-1 text-sm text-ink-soft">{t.company}</p>
                     <p
                       className={`mt-2 inline-flex items-center gap-1.5 text-xs font-num text-primary ${
-                        left ? 'sm:flex-row-reverse' : ''
+                        left ? 'md:flex-row-reverse' : ''
                       }`}
                     >
                       <MapPin size={11} /> {t.location}
@@ -92,9 +92,9 @@ export default function Timeline() {
                     animate={{ opacity: 1, x: 0 }}
                     viewport={{ once: true, amount: 0.35 }}
                     transition={{ duration: 0.55, delay: 0.1 }}
-                    className={`ml-12 sm:ml-0 mt-4 sm:mt-0 ${left ? 'sm:pl-12' : 'sm:pr-12'}`}
+                    className={`ml-10 sm:ml-12 md:ml-0 mt-4 md:mt-0 ${left ? 'md:pl-12' : 'md:pr-12'}`}
                   >
-                    <div className={`relative p-6 overflow-hidden ambient-float ${
+                    <div className={`relative p-5 sm:p-6 overflow-hidden ambient-float ${
                       i % 2 === 0 ? 'tier-3' : 'tier-1'
                     }`}>
                       <span

@@ -30,9 +30,9 @@ export default function Footer() {
     <footer className="relative mt-24">
       {/* Tonal lift, no border — section sits on surface-low against the page surface */}
       <div className="surface-low">
-        <div className="max-w-content mx-auto px-4 sm:px-6 py-14">
+        <div className="max-w-content mx-auto px-4 sm:px-6 py-12 sm:py-14">
           {/* asymmetric: 60 / 40 split breaks the standard grid */}
-          <div className="grid lg:grid-cols-[1.4fr_1fr] gap-10 items-start">
+          <div className="grid lg:grid-cols-[1.4fr_1fr] gap-8 lg:gap-10 items-start">
             <div>
               <p className="text-label-md text-primary">{footerCopy.creditsEyebrow}</p>
               <h3 className="font-display text-headline-md mt-3 max-w-md">
@@ -62,8 +62,8 @@ export default function Footer() {
                   <Github size={12} /> GitHub
                 </a>
                 <a href={`mailto:${profile.email}`}
-                   className="chip-resource hover:bg-surface-container transition">
-                  <Mail size={12} /> {profile.email}
+                   className="chip-resource hover:bg-surface-container transition max-w-full break-anywhere">
+                  <Mail size={12} className="shrink-0" /> {profile.email}
                 </a>
               </div>
             </div>

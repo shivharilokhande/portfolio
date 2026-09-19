@@ -75,7 +75,7 @@ export default function Services() {
           initial="hidden"
           animate="show"
           viewport={{ once: true, amount: 0.2 }}
-          className="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 pt-4"
+          className="mt-12 grid sm:grid-cols-2 xl:grid-cols-4 gap-5 sm:gap-6 pt-4"
         >
           {services.map((s, i) => {
             const color = accentRing[s.accent];
@@ -104,7 +104,7 @@ export default function Services() {
                 )}
 
                 {/* INNER card — overflow-hidden so the corner blob is masked */}
-                <div className={`relative p-7 ${tier} overflow-hidden ${
+                <div className={`relative p-6 sm:p-7 ${tier} overflow-hidden ${
                   s.featured ? 'ambient-float-lg shadow-glow' : 'ambient-float'
                 }`}>
                   {/* tinted halo */}

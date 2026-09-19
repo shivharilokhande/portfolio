@@ -179,7 +179,7 @@ export default function ProductPage() {
           <li aria-hidden><ChevronRight size={12} className="text-muted" /></li>
           <li><Link to="/store" className="hover:text-ink transition">Store</Link></li>
           <li aria-hidden><ChevronRight size={12} className="text-muted" /></li>
-          <li aria-current="page" className="text-ink truncate max-w-[60vw] sm:max-w-none">{p.title}</li>
+          <li aria-current="page" className="text-ink truncate max-w-[60vw] sm:max-w-[40ch]">{p.title}</li>
         </ol>
       </nav>
 
@@ -228,15 +228,16 @@ export default function ProductPage() {
           </section>
         </div>
 
-        {/* RIGHT — sticky purchase panel */}
-        <aside className="lg:col-span-5">
-          <div className="lg:sticky lg:top-24 tier-3 ambient-float-lg p-7 sm:p-8">
+        {/* RIGHT — sticky purchase panel. Below lg it stacks ABOVE the gallery
+            and feature copy so title + price + Buy are the first thing on a phone. */}
+        <aside className="lg:col-span-5 order-first lg:order-none">
+          <div className="lg:sticky lg:top-24 tier-3 ambient-float-lg p-5 sm:p-8">
             <p className="text-label-md text-primary">{p.category}</p>
             <h1 className="mt-3 font-display text-2xl sm:text-3xl tracking-tight leading-tight">{p.title}</h1>
             <p className="mt-3 text-ink-soft">{p.tagline}</p>
 
-            <div className="mt-6 flex items-baseline gap-2 surface-low rounded-2xl p-4 -mx-1">
-              <span className="font-num font-semibold text-4xl text-gradient tracking-tight">
+            <div className="mt-6 flex flex-wrap items-baseline gap-x-2 gap-y-1 surface-low rounded-2xl p-4 -mx-1">
+              <span className="font-num font-semibold text-3xl sm:text-4xl text-gradient tracking-tight">
                 {formatMoney(price, currency)}
               </span>
               <span className="text-xs text-ink-soft">one-time · all updates included</span>

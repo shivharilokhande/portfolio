@@ -58,7 +58,7 @@
 .dark { color-scheme: light; }
 .dark :root, .dark { /* fall through to :root values */ }
 
-html { color-scheme: light; }
+html { color-scheme: light; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 html, body {
   background: rgb(var(--bg));
   color: rgb(var(--ink));
@@ -322,6 +322,9 @@ body {
 .canvas-host { position: absolute; inset: 0; z-index: 0; }
 
 /* floating skill dots (Skills.tsx CSS fallback) */
+/* Long single-token strings (emails, URLs, slugs) never force horizontal scroll */
+.break-anywhere { overflow-wrap: anywhere; word-break: break-word; }
+
 /* Testimonials marquee — duplicated track, translate by half its width */
 @keyframes marquee {
   from { transform: translateX(0); }
@@ -372,9 +375,16 @@ body {
 .cinema-pin   { position: relative; width: 100%; height: 100vh; overflow: hidden; }
 
 /* Editorial display ramp — sharp scale jumps for "white space" hierarchy */
-.text-display-lg  { font-size: clamp(3.5rem, 9vw, 7rem);    line-height: 0.95; letter-spacing: -0.03em; }
-.text-display-md  { font-size: clamp(2.5rem, 6vw, 4.5rem);  line-height: 0.98; letter-spacing: -0.025em; }
-.text-headline-lg { font-size: clamp(2rem, 4.5vw, 3rem);    line-height: 1.05; letter-spacing: -0.02em; }
+.text-display-lg  { font-size: clamp(2.625rem, 3vw + 2.5rem, 7rem); line-height: 0.95; letter-spacing: -0.03em; overflow-wrap: anywhere; }
+.text-display-md  { font-size: clamp(2.125rem, 2.5vw + 1.5rem, 4.5rem); line-height: 0.98; letter-spacing: -0.025em; overflow-wrap: anywhere; }
+.text-headline-lg { font-size: clamp(1.75rem, 1.5vw + 1.25rem, 3rem);  line-height: 1.05; letter-spacing: -0.02em; }
+/* Phone/tablet ramps above are gentler so a 10-letter word fits a 360px
+   viewport; from laptop widths up the original editorial ramp applies. */
+@media (min-width: 1024px) {
+  .text-display-lg  { font-size: clamp(3.5rem, 9vw, 7rem); }
+  .text-display-md  { font-size: clamp(2.5rem, 6vw, 4.5rem); }
+  .text-headline-lg { font-size: clamp(2rem, 4.5vw, 3rem); }
+}
 .text-headline-md { font-size: clamp(1.5rem, 3vw, 2rem);    line-height: 1.15; letter-spacing: -0.015em; }
 .text-label-md    { font-size: 0.8125rem; letter-spacing: 0.10em; text-transform: uppercase; font-weight: 500; }
 .text-label-sm    { font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 600; }

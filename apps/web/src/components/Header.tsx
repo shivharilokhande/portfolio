@@ -24,8 +24,11 @@ const links: NavLink[] = [
   { id: 'portfolio',    label: 'Portfolio', href: '/portfolio/', external: true },
 ];
 
-function LinkItem({ l, onClick }: { l: NavLink; onClick?: () => void }) {
-  const cls = 'px-3 py-2 rounded-lg text-ink-soft hover:text-ink hover:bg-surface-low/70 transition';
+function LinkItem({ l, onClick, mobile = false }: { l: NavLink; onClick?: () => void; mobile?: boolean }) {
+  // Mobile rows are full-width, 44px-tall tap targets; desktop keeps the compact pill.
+  const cls = mobile
+    ? 'flex items-center min-h-[44px] px-3 py-2 rounded-lg text-base text-ink-soft hover:text-ink hover:bg-surface-low/70 transition'
+    : 'px-3 py-2 rounded-lg text-ink-soft hover:text-ink hover:bg-surface-low/70 transition';
   if (l.href.startsWith('/') && !l.external) {
     // Hovering/focusing the Store link is a strong intent signal — start
     // waking the backend before the click so the catalog loads live sooner.
@@ -96,7 +99,8 @@ export default function Header() {
           </span>
         </a>
 
-        <ul className="hidden md:flex items-center gap-1 text-sm">
+        {/* Nine links + cart + CV + CTA need ~1100px; below xl the burger menu carries them. */}
+        <ul className="hidden xl:flex items-center gap-1 text-sm">
           {links.map((l) => (
             <li key={l.id}><LinkItem l={l} /></li>
           ))}
@@ -108,7 +112,7 @@ export default function Header() {
             aria-label={`Cart, ${cartCount} items`}
             onPointerEnter={warmApi}
             onFocus={warmApi}
-            className="relative p-2 rounded-lg ghost-line hover:bg-surface-low/70 transition"
+            className="relative w-11 h-11 grid place-items-center rounded-lg ghost-line hover:bg-surface-low/70 transition"
           >
             <ShoppingBag size={16} />
             {cartCount > 0 && (
@@ -134,7 +138,7 @@ export default function Header() {
               download={cvDownloadName(profile)}
               target={profile.cvUrl.startsWith('http') ? '_blank' : undefined}
               rel={profile.cvUrl.startsWith('http') ? 'noreferrer' : undefined}
-              className="hidden sm:inline-flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium ghost-line hover:bg-surface-low/70 transition"
+              className="hidden sm:inline-flex items-center gap-1 min-h-[44px] px-3 py-2 rounded-lg text-sm font-medium ghost-line hover:bg-surface-low/70 transition"
             >
               CV
             </a>
@@ -143,13 +147,13 @@ export default function Header() {
               (/store/*, /admin/*), not just the home page. */}
           <a
             href="/#contact"
-            className="hidden md:inline-flex btn-primary text-sm"
+            className="hidden sm:inline-flex btn-primary text-sm"
           >
             Let&apos;s talk
             <ArrowUpRight size={14} />
           </a>
           <button
-            className="md:hidden p-2 rounded-lg ghost-line"
+            className="xl:hidden w-11 h-11 grid place-items-center rounded-lg ghost-line"
             onClick={() => setOpen((o) => !o)}
             aria-label="Toggle menu"
             aria-expanded={open}
@@ -160,11 +164,29 @@ export default function Header() {
       </nav>
 
       {open && (
-        <div className="md:hidden glass">
-          <ul className="max-w-content mx-auto px-4 py-3 flex flex-col gap-1 text-sm">
+        <div className="xl:hidden glass-strong ambient-float max-h-[calc(100dvh-4rem)] overflow-y-auto">
+          <ul className="max-w-content mx-auto px-4 sm:px-6 py-3 flex flex-col gap-0.5 text-sm">
             {links.map((l) => (
-              <li key={l.id}><LinkItem l={l} onClick={() => setOpen(false)} /></li>
+              <li key={l.id}><LinkItem l={l} mobile onClick={() => setOpen(false)} /></li>
             ))}
+            {/* CTA + CV rows for phones, where the header hides them */}
+            <li className="sm:hidden mt-2 flex flex-wrap gap-2 px-1 pb-2">
+              <a href="/#contact" onClick={() => setOpen(false)} className="btn-primary text-sm min-h-[44px]">
+                Let&apos;s talk <ArrowUpRight size={14} />
+              </a>
+              {isValidCvUrl(profile.cvUrl) && (
+                <a
+                  href={assetUrl(profile.cvUrl)}
+                  download={cvDownloadName(profile)}
+                  target={profile.cvUrl.startsWith('http') ? '_blank' : undefined}
+                  rel={profile.cvUrl.startsWith('http') ? 'noreferrer' : undefined}
+                  onClick={() => setOpen(false)}
+                  className="inline-flex items-center min-h-[44px] px-4 rounded-lg text-sm font-medium ghost-line hover:bg-surface-low/70 transition"
+                >
+                  Download CV
+                </a>
+              )}
+            </li>
           </ul>
         </div>
       )}

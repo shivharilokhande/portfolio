@@ -58,18 +58,20 @@ export default function StoreLayout() {
         <a href="#main" className="sr-only focus:not-sr-only fixed top-2 left-2 z-[60] glass px-3 py-1 rounded">Skip to content</a>
 
         <nav className="max-w-content mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <Link
               to="/"
-              className="inline-flex items-center gap-2 text-sm text-muted hover:text-ink transition"
+              className="inline-flex items-center justify-center gap-2 min-w-[44px] min-h-[44px] -ml-2 sm:ml-0 sm:min-w-0 text-sm text-muted hover:text-ink transition"
               aria-label="Back to portfolio"
             >
               <ArrowLeft size={16} />
               <span className="hidden sm:inline">Portfolio</span>
             </Link>
-            <span className="h-5 w-px bg-outline-variant/30" />
-            <Link to="/store" className="group flex items-center gap-2">
-              <BrandLogo />
+            <span className="h-5 w-px bg-outline-variant/30 hidden sm:block" />
+            <Link to="/store" className="group flex items-center gap-2 min-w-0">
+              {/* Wordmark text hidden on phones: badge + "store" tag + currency toggle + cart is all a 360px bar can hold. */}
+              <BrandLogo className="hidden sm:inline-flex" />
+              <span className="sm:hidden"><BrandLogo hideText /></span>
               <span className="ml-1 text-[10px] font-num uppercase tracking-[0.16em] text-primary px-1.5 py-0.5 rounded surface-low ghost-line">store</span>
             </Link>
           </div>
@@ -88,11 +90,11 @@ export default function StoreLayout() {
 
           <div className="flex items-center gap-2">
             {/* Currency toggle — surface-low pill, primary gradient on active */}
-            <div className="flex items-center rounded-lg surface-low ghost-line p-0.5 text-xs">
+            <div className="flex items-center rounded-lg surface-low ghost-line p-0.5 text-xs shrink-0">
               <button
                 aria-pressed={currency === 'INR'}
                 onClick={() => setCurrency('INR')}
-                className={`px-2 py-1 rounded-md inline-flex items-center gap-1 transition ${
+                className={`px-2 py-2 sm:py-1 rounded-md inline-flex items-center gap-1 transition ${
                   currency === 'INR' ? 'bg-gradient-to-br from-primary to-primary-soft text-on-primary' : 'text-ink-soft hover:text-ink'
                 }`}
               >
@@ -101,7 +103,7 @@ export default function StoreLayout() {
               <button
                 aria-pressed={currency === 'USD'}
                 onClick={() => setCurrency('USD')}
-                className={`px-2 py-1 rounded-md inline-flex items-center gap-1 transition ${
+                className={`px-2 py-2 sm:py-1 rounded-md inline-flex items-center gap-1 transition ${
                   currency === 'USD' ? 'bg-gradient-to-br from-primary to-primary-soft text-on-primary' : 'text-ink-soft hover:text-ink'
                 }`}
               >
@@ -112,7 +114,7 @@ export default function StoreLayout() {
             <Link
               to="/store/cart"
               aria-label={`Cart, ${count} items`}
-              className="relative p-2 rounded-lg ghost-line hover:bg-surface-low/70 transition"
+              className="relative w-11 h-11 grid place-items-center rounded-lg ghost-line hover:bg-surface-low/70 transition shrink-0"
             >
               <ShoppingBag size={16} />
               {count > 0 && (
