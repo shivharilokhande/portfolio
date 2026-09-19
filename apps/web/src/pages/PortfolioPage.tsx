@@ -18,6 +18,7 @@ import Timeline from '../sections/Timeline';
 import Projects from '../sections/Projects';
 import Testimonials from '../sections/Testimonials';
 import Services from '../sections/Services';
+import FAQ from '../sections/FAQ';
 import Contact from '../sections/Contact';
 import Footer from '../sections/Footer';
 // PortfolioContentProvider now wraps <Routes> at the App root so every
@@ -80,6 +81,7 @@ export default function PortfolioPage() {
         <Projects />
         <Testimonials />
         <Services />
+        <FAQ />
         <Contact />
       </main>
 

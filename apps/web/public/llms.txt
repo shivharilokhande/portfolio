@@ -19,3 +19,5 @@
 ## Contact
 - Email: shivlokhande7080@gmail.com
 - Phone: +91 95189 56711
+
+Full version with FAQ and page index: https://shivhari.tech/llms-full.txt

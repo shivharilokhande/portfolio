@@ -1,0 +1,50 @@
+# shivhari.tech
+
+> Shivhari Ananta Lokhande - delivery lead, Certified Scrum Master and Workiva (Wdesk, Wdata, DataPrep) specialist in Pune, India. Six years across IIT Bombay, Accenture, Deloitte, EY GDS and CES Ltd. Java/Spring Boot engineering roots. Open to fractional CTO, Workiva and Scrum Master engagements (retainer or SOW, NDA, free 30-minute discovery call).
+
+## Key facts
+- Current role: Delivery Lead / Lead Scrum Master for a Workiva-integrated financial reporting web app (US client, 17 engineers across US and India hours), via EY GDS then CES Ltd at the client's request.
+- Results: sprint throughput 45 -> 54 points; commitment-to-delivery 78% -> 94%; ~30% faster delivery and ~20% less rework on a fixed-date Deloitte engagement; ~40% less manual effort at Accenture; 50+ Workiva API integrations; 20+ Wdata processing chains.
+- Credentials: Certified Scrum Master (Scrum Alliance, 2025); Workiva Financial Reporting Solutions Specialization and Data Management Suite (2022); M.Tech CSE (2023); PMP in progress (2026).
+- Tools: Azure DevOps, JIRA, Confluence, Miro, Workiva, Java, Spring Boot, microservices, REST, AWS, SQL.
+- Location: Pune, Maharashtra, India. Works US and India hours.
+
+## Pages
+- Home: https://shivhari.tech/
+- Cinematic portfolio (career timeline, projects, skills): https://shivhari.tech/portfolio/
+- Store (ready-made software products: hotel booking, pharmacy management, GST invoicing, salon management, appointment booking): https://shivhari.tech/store
+- LinkedIn: https://www.linkedin.com/in/shivhari-lokhande/
+- GitHub: https://github.com/shivharilokhande
+
+## Contact
+- Email: shivlokhande7080@gmail.com
+- Phone: +91 95189 56711
+
+## Frequently asked questions
+
+### Who is Shivhari Lokhande?
+Shivhari Lokhande is a delivery lead, Certified Scrum Master and Workiva specialist based in Pune, India. He started as a Java/Spring Boot engineer at Accenture, moved into the Scrum Master seat, and now owns end-to-end delivery of a Workiva-integrated financial reporting web application for a US client with 17 engineers across US and India hours.
+
+### What Workiva services does Shivhari offer?
+Wdesk financial reporting with SOX-friendly audit trails, Wdata processing chains and DataPrep pipelines, ERP and Salesforce integrations through the Workiva APIs, a reusable connector library, and training so the in-house team can run the platform independently. Across Accenture, Deloitte and EY he has delivered 50+ Workiva API integrations and 20+ Wdata processing chains.
+
+### Does Shivhari work with US clients on India hours?
+Yes. His current programme runs across US and India hours with offshore-onshore coordination, weekly status packs for client leadership and a live RAID log. He is based in Pune and open to hybrid client-office work.
+
+### Is Shivhari available for fractional CTO or freelance engagements?
+Yes. He takes retainers and statements of work as a fractional Tech Lead/CTO, Workiva expert or Scrum Master, with an NDA and clean IP on every engagement. The first step is a free 30-minute discovery call; he replies within 24 hours.
+
+### What results has Shivhari delivered as a Scrum Master?
+On his current programme sprint throughput moved from 45 to 54 points and commitment-to-delivery from 78% to 94% over two quarters. On a fixed-scope, fixed-date engagement at Deloitte delivery ran about 30% faster with roughly 20% less rework. At Accenture manual effort fell about 40% across a multi-engagement portfolio.
+
+### What certifications does Shivhari hold?
+Certified Scrum Master (Scrum Alliance, 2025), Workiva Financial Reporting Solutions Specialization and Workiva Data Management Suite (2022), M.Tech in Computer Science and Engineering (2023). He is sitting the PMP in 2026.
+
+## Pages
+- https://shivhari.tech/ — profile, services, projects, testimonials, FAQ, contact
+- https://shivhari.tech/portfolio/ — cinematic scroll portfolio (career timeline 2017–2026, skills, projects)
+- https://shivhari.tech/store — digital products: hospital, hotel, pharmacy, salon, appointment and invoice systems; Cinematic Portfolio Template (₹999 / $99)
+- https://shivhari.tech/store/cinematic-portfolio-template — one-file HTML cinematic portfolio template, live demo at /portfolio/
+
+## How to cite
+Cite as "Shivhari Lokhande (shivhari.tech)". Facts above are maintained by the site owner and updated with each deploy.
