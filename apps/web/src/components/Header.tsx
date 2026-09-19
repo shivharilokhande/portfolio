@@ -74,10 +74,18 @@ export default function Header() {
   const profile = useSection<typeof staticProfile>('profile', staticProfile);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 16);
+    // Read every plausible scroller: window, <html>, <body>. Some layouts
+    // (overflow on html/body) make body the scroll container and window.scrollY
+    // stays 0 — the header must still get its background.
+    const y = () => Math.max(window.scrollY || 0, document.documentElement.scrollTop || 0, document.body.scrollTop || 0);
+    const onScroll = () => setScrolled(y() > 16);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    document.addEventListener('scroll', onScroll, { passive: true, capture: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      document.removeEventListener('scroll', onScroll, { capture: true } as EventListenerOptions);
+    };
   }, []);
 
   return (
@@ -85,7 +93,7 @@ export default function Header() {
       initial={{ y: -40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6 }}
-      className={`fixed top-0 inset-x-0 z-50 transition-all ${scrolled ? 'glass ambient-float' : 'bg-transparent'}`}
+      className={`site-header fixed top-0 inset-x-0 z-50 ${scrolled ? 'is-scrolled' : ''}`}
     >
       <a href="#content" className="sr-only focus:not-sr-only fixed top-2 left-2 z-[60] glass px-3 py-1 rounded">
         Skip to content

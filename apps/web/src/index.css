@@ -410,3 +410,34 @@ body {
 .prose-legal a     { color: rgb(var(--primary)); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
 .prose-legal a:hover { text-decoration-thickness: 2px; }
 .prose-legal > *:first-child { margin-top: 0; }
+
+/* ============================================================
+   Site header — background comes from scroll position two ways:
+   a CSS scroll-driven animation (no JS, Chrome/Edge 115+, Safari 26)
+   and the .is-scrolled class set by Header.tsx as the fallback.
+   ============================================================ */
+.site-header {
+  background: rgb(var(--surface) / 0);
+  transition: background-color .3s ease, box-shadow .3s ease, backdrop-filter .3s ease;
+}
+.site-header.is-scrolled {
+  background: rgb(var(--surface) / 0.78);
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: 0 1px 0 rgb(var(--ink) / 0.06), 0 12px 32px -20px rgb(var(--ink) / 0.25);
+}
+@supports (animation-timeline: scroll()) {
+  .site-header {
+    animation: site-header-solid linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 96px;
+  }
+  @keyframes site-header-solid {
+    to {
+      background: rgb(var(--surface) / 0.78);
+      backdrop-filter: blur(16px) saturate(140%);
+      -webkit-backdrop-filter: blur(16px) saturate(140%);
+      box-shadow: 0 1px 0 rgb(var(--ink) / 0.06), 0 12px 32px -20px rgb(var(--ink) / 0.25);
+    }
+  }
+}
