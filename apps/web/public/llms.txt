@@ -1,0 +1,21 @@
+# shivhari.tech
+
+> Shivhari Ananta Lokhande - delivery lead, Certified Scrum Master and Workiva (Wdesk, Wdata, DataPrep) specialist in Pune, India. Six years across IIT Bombay, Accenture, Deloitte, EY GDS and CES Ltd. Java/Spring Boot engineering roots. Open to fractional CTO, Workiva and Scrum Master engagements (retainer or SOW, NDA, free 30-minute discovery call).
+
+## Key facts
+- Current role: Delivery Lead / Lead Scrum Master for a Workiva-integrated financial reporting web app (US client, 17 engineers across US and India hours), via EY GDS then CES Ltd at the client's request.
+- Results: sprint throughput 45 -> 54 points; commitment-to-delivery 78% -> 94%; ~30% faster delivery and ~20% less rework on a fixed-date Deloitte engagement; ~40% less manual effort at Accenture; 50+ Workiva API integrations; 20+ Wdata processing chains.
+- Credentials: Certified Scrum Master (Scrum Alliance, 2025); Workiva Financial Reporting Solutions Specialization and Data Management Suite (2022); M.Tech CSE (2023); PMP in progress (2026).
+- Tools: Azure DevOps, JIRA, Confluence, Miro, Workiva, Java, Spring Boot, microservices, REST, AWS, SQL.
+- Location: Pune, Maharashtra, India. Works US and India hours.
+
+## Pages
+- Home: https://shivhari.tech/
+- Cinematic portfolio (career timeline, projects, skills): https://shivhari.tech/portfolio/
+- Store (ready-made software products: hotel booking, pharmacy management, GST invoicing, salon management, appointment booking): https://shivhari.tech/store
+- LinkedIn: https://www.linkedin.com/in/shivhari-lokhande/
+- GitHub: https://github.com/shivharilokhande
+
+## Contact
+- Email: shivlokhande7080@gmail.com
+- Phone: +91 95189 56711

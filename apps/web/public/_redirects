@@ -1,7 +1,10 @@
-# Cloudflare Pages SPA fallback.
-# Any request that doesn't match a static file gets served the SPA shell
-# (index.html) so react-router can handle client-side routing. Without
-# this, deep-linking to /admin/login or /store/checkout returns 404.
-/portfolio      /portfolio/index.html   200
-/portfolio/     /portfolio/index.html   200
-/*    /index.html   200
+# Cloudflare Pages routing.
+# Static files (portfolio/, og.jpg, llms.txt, robots.txt, sitemap.xml, assets/) are served first.
+# The SPA shell is served ONLY for known routes so unknown URLs return a real 404 (404.html).
+/portfolio          /portfolio/index.html   200
+/portfolio/         /portfolio/index.html   200
+/store              /index.html   200
+/store/*            /index.html   200
+/legal/*            /index.html   200
+/admin              /index.html   200
+/admin/*            /index.html   200

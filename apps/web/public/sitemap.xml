@@ -1,24 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  The live sitemap is served dynamically by the Spring Boot backend at
-  /sitemap.xml (see SitemapController.java). It uses the admin-configurable
-  `site.baseUrl` setting so buyers of the template don't have to hand-edit
-  a static file with their own domain.
-
-  This static file exists only as a fallback for setups that serve the SPA
-  from a CDN with no backend reachable at /sitemap.xml (e.g. a Vercel
-  preview with the API detached). If you deploy that way, replace this
-  file with your real sitemap.
--->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>/portfolio/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
+  <url><loc>https://shivhari.tech/</loc><lastmod>2026-09-19</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://shivhari.tech/portfolio/</loc><lastmod>2026-09-19</lastmod><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://shivhari.tech/store</loc><lastmod>2026-09-19</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://shivhari.tech/legal/privacy</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://shivhari.tech/legal/terms</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://shivhari.tech/legal/refund</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
 </urlset>

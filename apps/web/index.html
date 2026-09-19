@@ -6,53 +6,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#f8f9ff" />
 
-    <!--
-      Default meta tags below are placeholders. The App root mounts a
-      `useSiteMeta()` hook that overwrites <title> / description /
-      canonical / OG / Twitter tags at runtime from the CMS Profile row.
-      Crawlers that execute JS see the CMS values; crawlers that don't
-      (rare, but e.g. some LinkedIn preview bots) see these defaults. Edit
-      them to match your primary deployment domain before launch.
-    -->
-    <title>Portfolio</title>
-    <meta name="description" content="Personal portfolio site." />
-    <meta name="author" content="" />
-    <!--
-      Canonical + og:url are intentionally omitted from the static HTML.
-      Vite 7's build-html plugin tries to resolve href="/" as a local asset
-      and throws EISDIR because "/" is a directory. useSiteMeta() injects
-      the correct absolute URL from the CMS at runtime for JS-aware crawlers.
-    -->
+    <title>Shivhari Lokhande — Delivery Lead, Certified Scrum Master &amp; Workiva Specialist, Pune</title>
+    <meta name="description" content="Shivhari Lokhande is a delivery lead, Certified Scrum Master and Workiva (Wdesk, Wdata) specialist in Pune with six years across IIT Bombay, Accenture, Deloitte, EY and CES. Java/Spring Boot engineering roots; end-to-end agile delivery for US financial-reporting teams. Open to fractional CTO and hybrid engagements." />
+    <meta name="author" content="Shivhari Ananta Lokhande" />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <link rel="canonical" href="https://shivhari.tech/" />
 
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Portfolio" />
-    <meta property="og:description" content="Personal portfolio site." />
-
-    <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content="Portfolio" />
-    <meta name="twitter:description" content="Personal portfolio site." />
+    <meta property="og:type" content="profile" />
+    <meta property="og:site_name" content="shivhari.tech" />
+    <meta property="og:url" content="https://shivhari.tech/" />
+    <meta property="og:title" content="Shivhari Lokhande — Delivery Lead · Certified Scrum Master · Workiva Specialist" />
+    <meta property="og:description" content="Six years across IIT Bombay, Accenture, Deloitte, EY and CES. Workiva-integrated financial reporting, Java/Spring Boot platforms and honest agile delivery. Pune, India — open to fractional CTO work." />
+    <meta property="og:image" content="https://shivhari.tech/og.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="en_IN" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Shivhari Lokhande — Delivery Lead · CSM · Workiva" />
+    <meta name="twitter:description" content="Sprint throughput 45→54 pts, commitment 78→94%, 50+ Workiva API integrations. Pune, India." />
+    <meta name="twitter:image" content="https://shivhari.tech/og.jpg" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
-    <!--
-      Structured data is intentionally omitted from index.html for template
-      distribution. If you want a Person schema, add your own JSON-LD block
-      here after edit — or attach it dynamically from useSiteMeta().
-    -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "",
-      "url": "/",
-      "sameAs": []
-    }
-    </script>
+    <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Person","@id":"https://shivhari.tech/#person","name":"Shivhari Ananta Lokhande","alternateName":"Shivhari Lokhande","jobTitle":"Delivery Lead · Certified Scrum Master · Workiva Specialist","description":"Delivery lead and Certified Scrum Master with Java/Spring Boot engineering roots; Workiva (Wdesk, Wdata, DataPrep) specialist for enterprise financial reporting. Six years across IIT Bombay, Accenture, Deloitte, EY and CES.","url":"https://shivhari.tech/","image":"https://shivhari.tech/og.jpg","email":"mailto:shivlokhande7080@gmail.com","telephone":"+91-95189-56711","address":{"@type":"PostalAddress","addressLocality":"Pune","addressRegion":"Maharashtra","addressCountry":"IN"},"sameAs":["https://www.linkedin.com/in/shivhari-lokhande/","https://github.com/shivharilokhande","https://shivhari.tech/portfolio/"],"worksFor":{"@type":"Organization","name":"CES Ltd"},"alumniOf":[{"@type":"CollegeOrUniversity","name":"G.H. Raisoni College of Engineering and Management, Pune"},{"@type":"CollegeOrUniversity","name":"Indian Institute of Technology Bombay"}],"hasCredential":[{"@type":"EducationalOccupationalCredential","name":"Certified Scrum Master (CSM)","credentialCategory":"certification","recognizedBy":{"@type":"Organization","name":"Scrum Alliance"}},{"@type":"EducationalOccupationalCredential","name":"Workiva Financial Reporting Solutions Specialization","credentialCategory":"certification"},{"@type":"EducationalOccupationalCredential","name":"Workiva Data Management Suite","credentialCategory":"certification"}],"knowsAbout":["Scrum","Agile delivery","Program management","Workiva","Wdesk","Wdata","DataPrep","Java","Spring Boot","Microservices","AWS","Azure DevOps","Financial reporting","RAID management","Fractional CTO"]},{"@type":"WebSite","@id":"https://shivhari.tech/#website","url":"https://shivhari.tech/","name":"shivhari.tech","publisher":{"@id":"https://shivhari.tech/#person"},"inLanguage":"en"},{"@type":"ProfilePage","@id":"https://shivhari.tech/#profile","url":"https://shivhari.tech/","mainEntity":{"@id":"https://shivhari.tech/#person"},"isPartOf":{"@id":"https://shivhari.tech/#website"}},{"@type":"Service","name":"Workiva implementation (Wdesk + Wdata)","provider":{"@id":"https://shivhari.tech/#person"},"areaServed":["IN","US"],"serviceType":"Financial reporting platform implementation","description":"Wdesk financial reporting with SOX-friendly audit trails, Wdata processing chains and ERP/Salesforce integrations, reusable connector library, team training."},{"@type":"Service","name":"Fractional Tech Lead / CTO","provider":{"@id":"https://shivhari.tech/#person"},"areaServed":["IN","US"],"serviceType":"Technical leadership","description":"End-to-end delivery for cross-functional product teams: architecture decisions, sprint cadence, squad coaching, stakeholder and roadmap alignment."},{"@type":"Service","name":"Scrum Master and delivery coaching","provider":{"@id":"https://shivhari.tech/#person"},"areaServed":["IN","US"],"serviceType":"Agile delivery","description":"Sprint planning, stand-ups, reviews, retros, backlog refinement, scrum-of-scrums, DoD/DoR, RAID and weekly status reporting for offshore-onshore teams."},{"@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Who is Shivhari Lokhande?","acceptedAnswer":{"@type":"Answer","text":"Shivhari Lokhande is a delivery lead, Certified Scrum Master and Workiva specialist based in Pune, India. He started as a Java/Spring Boot engineer at Accenture, moved into the Scrum Master seat, and now owns end-to-end delivery of a Workiva-integrated financial reporting web application for a US client with 17 engineers across US and India hours."}},{"@type":"Question","name":"What Workiva services does Shivhari offer?","acceptedAnswer":{"@type":"Answer","text":"Wdesk financial reporting with SOX-friendly audit trails, Wdata processing chains and DataPrep pipelines, ERP and Salesforce integrations through the Workiva APIs, a reusable connector library, and training so the in-house team can run the platform independently. Across Accenture, Deloitte and EY he has delivered 50+ Workiva API integrations and 20+ Wdata processing chains."}},{"@type":"Question","name":"Does Shivhari work with US clients on India hours?","acceptedAnswer":{"@type":"Answer","text":"Yes. His current programme runs across US and India hours with offshore-onshore coordination, weekly status packs for client leadership and a live RAID log. He is based in Pune and open to hybrid client-office work."}},{"@type":"Question","name":"Is Shivhari available for fractional CTO or freelance engagements?","acceptedAnswer":{"@type":"Answer","text":"Yes. He takes retainers and statements of work as a fractional Tech Lead/CTO, Workiva expert or Scrum Master, with an NDA and clean IP on every engagement. The first step is a free 30-minute discovery call; he replies within 24 hours."}},{"@type":"Question","name":"What results has Shivhari delivered as a Scrum Master?","acceptedAnswer":{"@type":"Answer","text":"On his current programme sprint throughput moved from 45 to 54 points and commitment-to-delivery from 78% to 94% over two quarters. On a fixed-scope, fixed-date engagement at Deloitte delivery ran about 30% faster with roughly 20% less rework. At Accenture manual effort fell about 40% across a multi-engagement portfolio."}},{"@type":"Question","name":"What certifications does Shivhari hold?","acceptedAnswer":{"@type":"Answer","text":"Certified Scrum Master (Scrum Alliance, 2025), Workiva Financial Reporting Solutions Specialization and Workiva Data Management Suite (2022), M.Tech in Computer Science and Engineering (2023). He is sitting the PMP in 2026."}}]}]}</script>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="static-seo" style="max-width:720px;margin:48px auto;padding:0 20px;font:16px/1.6 Inter,system-ui,sans-serif;color:#1c1c24">
+        <h1 style="font-size:28px;margin:0 0 8px">Shivhari Lokhande — Delivery Lead, Certified Scrum Master &amp; Workiva Specialist</h1>
+        <p><strong>Pune, India · open to fractional CTO and hybrid client-office engagements.</strong></p>
+        <p>I came up through the code. I started in Java and Spring Boot at Accenture, moved into the Scrum Master seat on the same programme, and now own end-to-end delivery of a Workiva-integrated financial reporting web application built for a US client by 17 engineers across US and India hours. Six years across IIT Bombay, Accenture, Deloitte, EY GDS and CES Ltd.</p>
+        <p>What I do: delivery ownership (scope, milestones, releases against real capacity, honest go-live calls); Scrum day in and day out (planning, stand-ups, reviews, retros, scrum-of-scrums, DoD/DoR); risk and stakeholder management (live RAID log, weekly status packs for client leadership); Workiva implementation (Wdesk financial reporting, Wdata processing chains, DataPrep, ERP and Salesforce integrations — 50+ API integrations delivered); and coaching engineers.</p>
+        <p>Results: sprint throughput 45 → 54 points and commitment-to-delivery 78% → 94% over two quarters; ~30% faster delivery with ~20% less rework on a fixed-date engagement; ~40% less manual effort across a multi-engagement portfolio.</p>
+        <p>Credentials: Certified Scrum Master (Scrum Alliance, 2025), Workiva Financial Reporting &amp; Data Management (2022), M.Tech CSE (2023), PMP in progress (2026).</p>
+        <p><a href="/portfolio/">Cinematic portfolio</a> · <a href="/store">Store</a> · <a href="https://www.linkedin.com/in/shivhari-lokhande/">LinkedIn</a> · <a href="https://github.com/shivharilokhande">GitHub</a> · <a href="mailto:shivlokhande7080@gmail.com">shivlokhande7080@gmail.com</a></p>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

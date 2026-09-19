@@ -1,6 +1,16 @@
+import { useEffect } from 'react';
 import GlowButton from '../components/GlowButton';
 
 export default function NotFoundPage() {
+  // Tell crawlers this SPA fallback is not a page worth indexing (soft-404 guard).
+  useEffect(() => {
+    const m = document.createElement('meta');
+    m.name = 'robots'; m.content = 'noindex';
+    document.head.appendChild(m);
+    const prevTitle = document.title;
+    document.title = 'Page not found — shivhari.tech';
+    return () => { m.remove(); document.title = prevTitle; };
+  }, []);
   return (
     <div className="min-h-screen grid place-items-center text-center px-4 bg-bg">
       <div className="glass-strong rounded-3xl px-8 py-10 max-w-md">
