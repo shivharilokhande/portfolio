@@ -35,7 +35,7 @@ const FALLBACK_HERO: Required<Omit<HeroDoc, 'primaryCta' | 'secondaryCta'>> & {
   sub:          FALLBACK_SUB,
   badge:        'Available for forward-deployed & Workiva engagements',
   primaryCta:   { label: 'Book a free 30-min discovery call', href: '/#contact' },
-  secondaryCta: { label: 'See the work',                      href: '/portfolio/' },
+  secondaryCta: { label: '',                                   href: '' },
 };
 
 /** Whether profile.cvUrl should render as a working download link. */
@@ -65,8 +65,10 @@ export default function Hero() {
   const primaryLabel = hero.primaryCta?.label || FALLBACK_HERO.primaryCta.label;
   const primaryHref  = hero.primaryCta?.href  || profile.calendarUrl || FALLBACK_HERO.primaryCta.href;
   const primaryExternal = /^https?:\/\//.test(primaryHref);
-  const secondaryLabel = hero.secondaryCta?.label || FALLBACK_HERO.secondaryCta.label;
-  const secondaryHref  = hero.secondaryCta?.href  || FALLBACK_HERO.secondaryCta.href;
+  // Optional: rendered only when the CMS gives it both a label and a link.
+  const secondaryLabel = (hero.secondaryCta?.label ?? '').trim();
+  const secondaryHref  = (hero.secondaryCta?.href  ?? '').trim();
+  const showSecondary  = Boolean(secondaryLabel && secondaryHref);
   // Long, offer-style headlines drop one display step so they still fit
   // on three lines at desktop widths.
   const headlineSize = headlineWords.length > 7 ? 'text-display-md' : 'text-display-lg';
@@ -151,16 +153,17 @@ export default function Hero() {
                 {primaryLabel}
                 <ArrowRight size={16} />
               </motion.a>
-              {/* Plain anchor on purpose: /portfolio/ is a separate static
-                  page outside the SPA router. */}
-              <motion.a
-                variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
-                transition={{ duration: 0.5, ease: easeOut }}
-                href={secondaryHref}
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-lg surface-low ghost-line text-ink font-semibold text-sm hover:bg-surface-container transition"
-              >
-                {secondaryLabel} <ArrowRight size={16} aria-hidden />
-              </motion.a>
+              {/* Optional secondary CTA (plain anchor so it can point outside the SPA router). */}
+              {showSecondary && (
+                <motion.a
+                  variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
+                  transition={{ duration: 0.5, ease: easeOut }}
+                  href={secondaryHref}
+                  className="inline-flex items-center gap-2 px-5 py-3 rounded-lg surface-low ghost-line text-ink font-semibold text-sm hover:bg-surface-container transition"
+                >
+                  {secondaryLabel} <ArrowRight size={16} aria-hidden />
+                </motion.a>
+              )}
               {/* Render when the admin has either uploaded a PDF or set
                   cvUrl to any absolute URL. Empty / the stale seed default
                   are hidden to prevent a broken link. `download="…-cv.pdf"`

@@ -25,7 +25,7 @@ const DEFAULT: HeroDoc = {
   headline:     'Forward Deployed Engineer, Scrum Master & Workiva delivery lead.'.split(' '),
   badge:        'Available for forward-deployed & Workiva engagements',
   primaryCta:   { label: 'Book a free 30-min discovery call', href: '/#contact' },
-  secondaryCta: { label: 'See the work',                      href: '/portfolio/' },
+  secondaryCta: { label: '',                                   href: '' },
 };
 
 const easeOut = [0.16, 1, 0.3, 1] as const;
