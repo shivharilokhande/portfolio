@@ -7,7 +7,7 @@ import { useSection } from '../hooks/usePortfolioContent';
 import { useCart } from '../store/cartStore';
 import BrandLogo from './BrandLogo';
 
-type NavLink = { id: string; label: string; href: string };
+type NavLink = { id: string; label: string; href: string; external?: boolean };
 
 /** All in-page anchors use `/#…` so they resolve from any route (store/admin/etc.).
  *  On `/` the browser scrolls in place; from `/store/*` it navigates home first. */
@@ -20,11 +20,12 @@ const links: NavLink[] = [
   { id: 'testimonials', label: 'Voices',    href: '/#testimonials' },
   { id: 'services',     label: 'Services',  href: '/#services' },
   { id: 'contact',      label: 'Hire me',   href: '/#contact' },
+  { id: 'portfolio',    label: 'Portfolio', href: '/portfolio/', external: true },
 ];
 
 function LinkItem({ l, onClick }: { l: NavLink; onClick?: () => void }) {
   const cls = 'px-3 py-2 rounded-lg text-ink-soft hover:text-ink hover:bg-surface-low/70 transition';
-  if (l.href.startsWith('/')) {
+  if (l.href.startsWith('/') && !l.external) {
     return <Link to={l.href} onClick={onClick} className={cls}>{l.label}</Link>;
   }
   return <a href={l.href} onClick={onClick} className={cls}>{l.label}</a>;

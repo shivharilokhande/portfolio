@@ -44,6 +44,14 @@ server {
     try_files  $uri =404;
   }
 
+  # Cinematic portfolio — a static page shipped in public/portfolio/
+  location /portfolio/ {
+    root       /usr/share/nginx/html;
+    try_files  $uri $uri/ /portfolio/index.html;
+    add_header Cache-Control "no-cache";
+  }
+  location = /portfolio { return 301 /portfolio/; }
+
   # SPA fallback — every unknown path returns index.html so
   # react-router can take over.
   location / {

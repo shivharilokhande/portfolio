@@ -2,4 +2,6 @@
 # Any request that doesn't match a static file gets served the SPA shell
 # (index.html) so react-router can handle client-side routing. Without
 # this, deep-linking to /admin/login or /store/checkout returns 404.
+/portfolio      /portfolio/index.html   200
+/portfolio/     /portfolio/index.html   200
 /*    /index.html   200
