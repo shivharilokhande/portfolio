@@ -226,7 +226,7 @@ body.menu-open{overflow:hidden}
 }
 
 /* TIMELINE */
-#journey{position:relative;height:420vh;padding:0;background:
+#journey{position:relative;height:300vh;padding:0;background:
  radial-gradient(ellipse 60% 45% at 50% 100%,rgba(214,169,85,.16),transparent 70%),var(--ground)}
 #journey canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .tl-pin{position:sticky;top:0;height:100vh;overflow:hidden;padding-top:90px;display:flex;flex-direction:column}
@@ -308,7 +308,7 @@ body.menu-open{overflow:hidden}
 }
 
 /* WORK */
-#work{position:relative;padding-block:120px 110px;background:var(--panel);overflow:hidden}
+#work{position:relative;padding-block:100px 70px;background:var(--panel);overflow:hidden}
 #work::before{content:"";position:absolute;left:-20%;right:-20%;top:50%;height:1px;background:linear-gradient(90deg,transparent,var(--glow),transparent);opacity:.35;animation:sweep 6s ease-in-out infinite}
 @keyframes sweep{0%{transform:translateY(-220px) scaleX(.2)}50%{transform:translateY(220px) scaleX(1)}100%{transform:translateY(-220px) scaleX(.2)}}
 .work-head{text-align:center;position:relative;z-index:2}
@@ -334,7 +334,7 @@ body.menu-open{overflow:hidden}
 @media (max-width:900px){.stage{grid-template-columns:1fr}.stage .center{order:-1;height:260px}.stage .center::before{width:340px}}
 
 /* ABOUT */
-#about{padding-block:110px 100px;background:var(--ground);border-top:1px solid var(--line);position:relative;overflow:hidden}
+#about{padding-block:90px 100px;background:var(--ground);border-top:1px solid var(--line);position:relative;overflow:hidden}
 #about::after{content:"SCRUM";position:absolute;right:-2%;bottom:-6%;font-family:Anton,Impact,sans-serif;font-size:clamp(8rem,26vw,24rem);line-height:1;color:transparent;-webkit-text-stroke:1px rgba(239,228,216,.06);pointer-events:none;letter-spacing:.02em}
 .about-grid{max-width:1300px;margin:0 auto;display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(28px,5vw,80px);align-items:start;position:relative;z-index:1}
 .about-grid .scene-title{text-align:left;font-size:clamp(2rem,4.4vw,3.6rem);line-height:1.05}
@@ -415,7 +415,7 @@ footer{position:relative;z-index:2;display:flex;justify-content:space-between;fl
   <a class="cta" href="https://shivhari.tech/"><span>shivhari.tech</span><span class="arr"></span></a>
   <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><i></i><i></i><i></i></button>
 </nav>
-<div class="menu" id="menu"><a href="#home" style="--i:0">Home</a><a href="#universe" style="--i:1">Skills</a><a href="#journey" style="--i:2">Journey</a><a href="#work" style="--i:3">Work</a><a href="#about" style="--i:4">About</a><a href="#contact" style="--i:5">Contact</a><div class="mfoot"><a href="https://shivhari.tech/">← Back to shivhari.tech</a><span>Pune, IN</span><a href="mailto:shivlokhande7080@gmail.com">shivlokhande7080@gmail.com</a><a href="https://linkedin.com/in/shivhari-lokhande" target="_blank" rel="noopener">LinkedIn</a></div></div>
+<div class="menu" id="menu"><a href="#home" style="--i:0">Home</a><a href="#universe" style="--i:1">Skills</a><a href="#journey" style="--i:2">Journey</a><a href="#work" style="--i:3">Work</a><a href="#about" style="--i:4">About</a><a href="#contact" style="--i:5">Contact</a><div class="mfoot"><a href="https://shivhari.tech/">← Back to shivhari.tech</a><span>Pune, IN</span><a href="mailto:shivlokhande7080@gmail.com">shivlokhande7080@gmail.com</a><a href="https://www.linkedin.com/in/shivhari-lokhande/" target="_blank" rel="noopener">LinkedIn</a></div></div>
 
 <main id="main">
 <section id="home">
@@ -576,7 +576,7 @@ footer{position:relative;z-index:2;display:flex;justify-content:space-between;fl
         <h3>Small products, shipped on the side</h3>
         <p>Hotel booking with OTA channel sync, pharmacy management with batch and expiry tracking, GST e-invoicing, salon scheduling and an appointment engine — built end to end and running for real owners.</p>
         <div class="stats"><div><b><span class="cnt" data-to="5">0</span></b><span>Products live</span></div><div><b><span class="cnt" data-to="20">0</span>+</b><span>Workflows automated</span></div></div>
-        <div class="stack"><i>Spring Boot</i><i>REST</i><i>WhatsApp API</i><a href="https://shivhari.tech/#store" target="_blank" rel="noopener" style="font-style:normal;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;padding:4px 8px;border:1px solid var(--glow);border-radius:999px;color:var(--glow);text-decoration:none">Store →</a></div>
+        <div class="stack"><i>Spring Boot</i><i>REST</i><i>WhatsApp API</i><a href="https://shivhari.tech/store" style="font-style:normal;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;padding:4px 8px;border:1px solid var(--glow);border-radius:999px;color:var(--glow);text-decoration:none">Store →</a></div>
       </article>
     </div>
   </div>
