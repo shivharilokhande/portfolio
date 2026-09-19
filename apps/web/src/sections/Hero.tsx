@@ -33,7 +33,7 @@ const FALLBACK_HERO: Required<Omit<HeroDoc, 'primaryCta' | 'secondaryCta'>> & {
 } = {
   headline:     FALLBACK_HEADLINE,
   sub:          FALLBACK_SUB,
-  badge:        'Available for forward-deployed & Workiva engagements',
+  badge:        'Available for new engagements · US hours covered from India',
   primaryCta:   { label: 'Book a free 30-min discovery call', href: '/#contact' },
   secondaryCta: { label: '',                                   href: '' },
 };
