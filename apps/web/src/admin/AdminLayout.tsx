@@ -12,6 +12,8 @@ import {
 } from 'lucide-react';
 import { adminApi, adminToken } from './adminApi';
 import BrandLogo, { BrandWordmark } from '../components/BrandLogo';
+import { usePageMeta } from '../hooks/usePageMeta';
+import { SITE_NAME } from '../lib/site';
 
 const nav = [
   { to: '/admin/dashboard', label: 'Dashboard',     icon: <LayoutDashboard size={16} /> },
@@ -26,6 +28,9 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const isLogin  = location.pathname === '/admin/login' || location.pathname === '/admin';
+
+  // Admin is never indexable; canonical is the page itself (no home canonical leak).
+  usePageMeta({ title: `Admin — ${SITE_NAME}`, canonicalPath: location.pathname, noindex: true });
 
   // Synchronous gate — never render the sidebar / Outlet without a token.
   // The previous useEffect-based redirect briefly mounted admin pages

@@ -1,16 +1,12 @@
-import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import GlowButton from '../components/GlowButton';
+import { usePageMeta } from '../hooks/usePageMeta';
+import { SITE_NAME } from '../lib/site';
 
 export default function NotFoundPage() {
+  const { pathname } = useLocation();
   // Tell crawlers this SPA fallback is not a page worth indexing (soft-404 guard).
-  useEffect(() => {
-    const m = document.createElement('meta');
-    m.name = 'robots'; m.content = 'noindex';
-    document.head.appendChild(m);
-    const prevTitle = document.title;
-    document.title = 'Page not found — shivhari.tech';
-    return () => { m.remove(); document.title = prevTitle; };
-  }, []);
+  usePageMeta({ title: `Page not found — ${SITE_NAME}`, canonicalPath: pathname, noindex: true });
   return (
     <div className="min-h-screen grid place-items-center text-center px-4 bg-bg">
       <div className="glass-strong rounded-3xl px-8 py-10 max-w-md">

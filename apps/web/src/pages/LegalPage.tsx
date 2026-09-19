@@ -17,11 +17,19 @@ import { ArrowLeft } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../sections/Footer';
 import { useSection } from '../hooks/usePortfolioContent';
+import { usePageMeta, breadcrumbLd, truncate } from '../hooks/usePageMeta';
+import { SITE_NAME, absUrl } from '../lib/site';
 
 type LegalDoc = { title: string; lastUpdated: string; body: string };
 
 const KNOWN_SLUGS = ['terms', 'privacy', 'refund'] as const;
 type LegalSlug = (typeof KNOWN_SLUGS)[number];
+
+const META_TITLES: Record<LegalSlug, string> = {
+  terms: 'Terms',
+  privacy: 'Privacy Policy',
+  refund: 'Refund Policy',
+};
 
 const FALLBACKS: Record<LegalSlug, LegalDoc> = {
   terms: {
@@ -49,6 +57,27 @@ export default function LegalPage() {
 
   const doc = useSection<LegalDoc>(`legal.${validSlug}`, FALLBACKS[validSlug]);
   const html = useMemo(() => renderMiniMarkdown(doc.body ?? ''), [doc.body]);
+
+  const pageTitle = META_TITLES[validSlug];
+  usePageMeta({
+    title: `${pageTitle} — ${SITE_NAME}`,
+    description: truncate(doc.body, 155) || `${doc.title} for ${SITE_NAME}.`,
+    canonicalPath: `/legal/${validSlug}`,
+    type: 'website',
+    jsonLd: [
+      {
+        '@type': 'WebPage',
+        name: doc.title || pageTitle,
+        url: absUrl(`/legal/${validSlug}`),
+        ...(doc.lastUpdated ? { dateModified: doc.lastUpdated } : {}),
+        isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: absUrl('/') },
+      },
+      breadcrumbLd([
+        { name: 'Home', path: '/' },
+        { name: doc.title || pageTitle, path: `/legal/${validSlug}` },
+      ]),
+    ],
+  });
 
   return (
     <>

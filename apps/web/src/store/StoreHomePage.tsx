@@ -8,6 +8,12 @@ import { motion } from 'framer-motion';
 import ProductCard from './components/ProductCard';
 import { store, type ProductDto } from './storeApi';
 import { onStoreChanged } from '../lib/portfolioBus';
+import { usePageMeta, breadcrumbLd } from '../hooks/usePageMeta';
+import { SITE_OWNER, absUrl } from '../lib/site';
+
+const HERO_COPY =
+  'Production-grade source code for the systems I\'ve actually shipped — websites, ' +
+  'backends, trading bots, business tools. Pay once, download instantly, ship faster.';
 
 // Safety-net poll for cross-device sync (admin on laptop, catalog on phone).
 // Same-browser edits arrive instantly via the BroadcastChannel push below.
@@ -54,6 +60,33 @@ export default function StoreHomePage() {
     };
   }, [load]);
 
+  // Route meta + CollectionPage/ItemList/Breadcrumb JSON-LD (built from the loaded catalog).
+  usePageMeta({
+    title: `Store — ready-made software products by ${SITE_OWNER}`,
+    description: HERO_COPY,
+    canonicalPath: '/store',
+    type: 'website',
+    jsonLd: [
+      {
+        '@type': 'CollectionPage',
+        name: 'Store',
+        url: absUrl('/store'),
+        description: HERO_COPY,
+        mainEntity: {
+          '@type': 'ItemList',
+          numberOfItems: items.length,
+          itemListElement: items.map((p, i) => ({
+            '@type': 'ListItem',
+            position: i + 1,
+            name: p.title,
+            url: absUrl(`/store/${p.slug}`),
+          })),
+        },
+      },
+      breadcrumbLd([{ name: 'Home', path: '/' }, { name: 'Store', path: '/store' }]),
+    ],
+  });
+
   const categories = useMemo(
     () => ['All', ...Array.from(new Set(items.map((p) => p.category)))],
     [items],
@@ -96,8 +129,7 @@ export default function StoreHomePage() {
           transition={{ duration: 0.55, delay: 0.2 }}
           className="mt-5 max-w-2xl text-ink-soft leading-relaxed"
         >
-          Production-grade source code for the systems I&apos;ve actually shipped — websites,
-          backends, trading bots, business tools. Pay once, download instantly, ship faster.
+          {HERO_COPY}
         </motion.p>
       </section>
 

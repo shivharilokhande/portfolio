@@ -81,6 +81,8 @@ import { Lock, ArrowLeft, IndianRupee, CreditCard, Loader2 } from 'lucide-react'
 import { motion } from 'framer-motion';
 import { useCart, formatMoney } from './cartStore';
 import { store } from './storeApi';
+import { usePageMeta } from '../hooks/usePageMeta';
+import { SITE_NAME } from '../lib/site';
 
 type PayMethod = 'razorpay' | 'stripe';
 
@@ -99,6 +101,8 @@ export default function CheckoutPage() {
   const [method, setMethod] = useState<PayMethod>('razorpay');
   const [busy, setBusy] = useState(false);
   const [err, setErr]   = useState<string | null>(null);
+
+  usePageMeta({ title: `Checkout — ${SITE_NAME}`, canonicalPath: '/store/checkout', noindex: true });
 
   if (lines.length === 0) {
     return (

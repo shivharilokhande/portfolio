@@ -6,6 +6,8 @@ import { profile as staticProfile } from '../lib/data';
 import { useSection } from '../hooks/usePortfolioContent';
 import { useBrand } from '../components/BrandLogo';
 import { useCart } from './cartStore';
+import { usePageMeta } from '../hooks/usePageMeta';
+import { SITE_NAME } from '../lib/site';
 
 /**
  * SuccessPage — landing after Razorpay/Stripe payment succeeds.
@@ -42,6 +44,8 @@ export default function SuccessPage() {
   const clearCart   = useCart((s) => s.clear);
   const profile = useSection<typeof staticProfile>('profile', staticProfile);
   const brand   = useBrand();
+
+  usePageMeta({ title: `Order confirmed — ${SITE_NAME}`, canonicalPath: `/store/success/${orderId ?? ''}`, noindex: true });
 
   const [pollingState, setPollingState] = useState<
     { kind: 'idle' } |

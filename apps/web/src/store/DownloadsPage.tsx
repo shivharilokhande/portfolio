@@ -10,10 +10,14 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Download, ShieldCheck, ExternalLink, Clock, ArrowRight } from 'lucide-react';
 import { store, type DownloadBundleDto } from './storeApi';
+import { usePageMeta } from '../hooks/usePageMeta';
+import { SITE_NAME } from '../lib/site';
 
 export default function DownloadsPage() {
   const { token } = useParams<{ token: string }>();
   const [bundle, setBundle] = useState<DownloadBundleDto | null | undefined>(undefined);
+
+  usePageMeta({ title: `Your downloads — ${SITE_NAME}`, canonicalPath: `/store/downloads/${token ?? ''}`, noindex: true });
 
   useEffect(() => {
     let cancelled = false;

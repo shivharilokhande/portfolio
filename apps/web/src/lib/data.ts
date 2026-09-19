@@ -262,7 +262,9 @@ export const projects: ProjectTile[] = [
     metric: 'Template · brandable',
     accent: 'var(--brand)',
     span: 'sm',
-    storeSlug: 'shivhari-dev-template',
+    // Not listed in the store API (was /store/shivhari-dev-template → "Product
+    // not found"). Rendered as a non-link case-study tile until it ships.
+    caseStudy: true,
   },
   {
     id: 'eon-case',

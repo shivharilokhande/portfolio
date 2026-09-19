@@ -2,6 +2,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Minus, Plus, X, ShoppingBag, ArrowRight } from 'lucide-react';
 import { formatMoney, useCart } from './cartStore';
+import { usePageMeta } from '../hooks/usePageMeta';
+import { SITE_NAME } from '../lib/site';
 
 export default function CartPage() {
   const navigate = useNavigate();
@@ -11,6 +13,8 @@ export default function CartPage() {
   const remove      = useCart((s) => s.remove);
   const clear       = useCart((s) => s.clear);
   const subtotal    = useCart((s) => s.subtotal());
+
+  usePageMeta({ title: `Cart — ${SITE_NAME}`, canonicalPath: '/store/cart', noindex: true });
 
   if (lines.length === 0) {
     return (

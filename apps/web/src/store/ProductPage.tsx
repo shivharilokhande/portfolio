@@ -7,12 +7,68 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ShoppingBag, Check, FileDown, Tag, ArrowLeft, Sparkles, ArrowRight,
+  ShoppingBag, Check, FileDown, Tag, Sparkles, ArrowRight, ChevronRight,
 } from 'lucide-react';
 import { store, type ProductDto } from './storeApi';
 import { useCart, formatMoney } from './cartStore';
 import { onStoreChanged } from '../lib/portfolioBus';
 import { assetUrl } from '../lib/api';
+import { usePageMeta, breadcrumbLd, truncate, type PageMeta } from '../hooks/usePageMeta';
+import { DEFAULT_OG_IMAGE, SITE_NAME, SITE_OWNER, absUrl } from '../lib/site';
+
+/** Absolute image URLs for JSON-LD / og:image (API-relative → API origin, site-relative → site). */
+function productImages(p: ProductDto): string[] {
+  return (p.demoImages ?? [])
+    .filter(Boolean)
+    .map((u) => absUrl(assetUrl(u)));
+}
+
+function productMeta(slug: string | undefined, p: ProductDto | null | undefined): PageMeta {
+  const path = `/store/${slug ?? ''}`;
+  if (!p) {
+    return {
+      title: p === null ? `Product not found — ${SITE_NAME}` : `Store — ${SITE_NAME}`,
+      canonicalPath: path,
+      type: 'website',
+      noindex: p === null,
+    };
+  }
+  const images = productImages(p);
+  const description = truncate(p.tagline || p.description, 155);
+  const url = absUrl(`/store/${p.slug}`);
+  return {
+    title: `${p.title} — ₹${p.priceInr.toLocaleString('en-IN')} one-time | ${SITE_OWNER}`,
+    description,
+    canonicalPath: `/store/${p.slug}`,
+    type: 'product',
+    image: images[0],
+    jsonLd: [
+      {
+        '@type': 'Product',
+        name: p.title,
+        description: p.description || p.tagline,
+        sku: p.slug,
+        category: p.category,
+        brand: { '@type': 'Organization', name: SITE_NAME },
+        image: images.length > 0 ? images : [DEFAULT_OG_IMAGE],
+        url,
+        offers: {
+          '@type': 'Offer',
+          price: p.priceInr,
+          priceCurrency: 'INR',
+          availability: 'https://schema.org/InStock',
+          url,
+          seller: { '@type': 'Person', name: SITE_OWNER },
+        },
+      },
+      breadcrumbLd([
+        { name: 'Home', path: '/' },
+        { name: 'Store', path: '/store' },
+        { name: p.title, path: `/store/${p.slug}` },
+      ]),
+    ],
+  };
+}
 
 const POLL_MS = 30_000;
 
@@ -59,6 +115,10 @@ export default function ProductPage() {
     };
   }, [load]);
 
+  // Route meta + Product/Offer + BreadcrumbList JSON-LD. Called before the
+  // early returns so the hook order is stable across loading / 404 / loaded.
+  usePageMeta(productMeta(slug, p));
+
   if (p === undefined) {
     return (
       <div className="max-w-content mx-auto px-4 sm:px-6">
@@ -90,9 +150,16 @@ export default function ProductPage() {
 
   return (
     <div className="max-w-content mx-auto px-4 sm:px-6">
-      <Link to="/store" className="inline-flex items-center gap-1.5 text-xs text-ink-soft hover:text-ink mb-6">
-        <ArrowLeft size={13} /> All products
-      </Link>
+      {/* Breadcrumb — Home / Store / Product (mirrors the BreadcrumbList JSON-LD). */}
+      <nav aria-label="Breadcrumb" className="mb-6">
+        <ol className="flex flex-wrap items-center gap-1.5 text-xs text-ink-soft">
+          <li><Link to="/" className="hover:text-ink transition">Home</Link></li>
+          <li aria-hidden><ChevronRight size={12} className="text-muted" /></li>
+          <li><Link to="/store" className="hover:text-ink transition">Store</Link></li>
+          <li aria-hidden><ChevronRight size={12} className="text-muted" /></li>
+          <li aria-current="page" className="text-ink truncate max-w-[60vw] sm:max-w-none">{p.title}</li>
+        </ol>
+      </nav>
 
       <div className="grid lg:grid-cols-12 gap-8 lg:gap-12">
         {/* LEFT — hero + visual */}
