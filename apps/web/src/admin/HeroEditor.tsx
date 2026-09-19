@@ -22,8 +22,8 @@ type HeroDoc = {
 };
 
 const DEFAULT: HeroDoc = {
-  headline:     'Fractional CTO & Workiva delivery lead for US finance teams — on India hours.'.split(' '),
-  badge:        'Available for freelance & fractional CTO engagements',
+  headline:     'Forward Deployed Engineer & Workiva delivery lead for US finance teams — on India hours.'.split(' '),
+  badge:        'Available for forward-deployed & Workiva engagements',
   primaryCta:   { label: 'Book a free 30-min discovery call', href: '/#contact' },
   secondaryCta: { label: 'See the work',                      href: '/portfolio/' },
 };

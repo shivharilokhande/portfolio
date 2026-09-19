@@ -1,6 +1,6 @@
 # shivhari.tech
 
-> Shivhari Ananta Lokhande - delivery lead, Certified Scrum Master and Workiva (Wdesk, Wdata, DataPrep) specialist in Pune, India. Six years across IIT Bombay, Accenture, Deloitte, EY GDS and CES Ltd. Java/Spring Boot engineering roots. Open to fractional CTO, Workiva and Scrum Master engagements (retainer or SOW, NDA, free 30-minute discovery call).
+> Shivhari Ananta Lokhande - delivery lead, Certified Scrum Master and Workiva (Wdesk, Wdata, DataPrep) specialist in Pune, India. Six years across IIT Bombay, Accenture, Deloitte, EY GDS and CES Ltd. Java/Spring Boot engineering roots. Open to forward deployed engineer, Workiva and Scrum Master engagements (retainer or SOW, NDA, free 30-minute discovery call).
 
 ## Key facts
 - Current role: Delivery Lead / Lead Scrum Master for a Workiva-integrated financial reporting web app (US client, 17 engineers across US and India hours), via EY GDS then CES Ltd at the client's request.
@@ -31,8 +31,8 @@ Wdesk financial reporting with SOX-friendly audit trails, Wdata processing chain
 ### Does Shivhari work with US clients on India hours?
 Yes. His current programme runs across US and India hours with offshore-onshore coordination, weekly status packs for client leadership and a live RAID log. He is based in Pune and open to hybrid client-office work.
 
-### Is Shivhari available for fractional CTO or freelance engagements?
-Yes. He takes retainers and statements of work as a fractional Tech Lead/CTO, Workiva expert or Scrum Master, with an NDA and clean IP on every engagement. The first step is a free 30-minute discovery call; he replies within 24 hours.
+### Is Shivhari available as a forward deployed engineer or for freelance engagements?
+Yes. He takes per-customer engagements and retainers as a forward deployed engineer, Workiva expert or Scrum Master, with an NDA and clean IP on every engagement. The first step is a free 30-minute discovery call; he replies within 24 hours.
 
 ### What results has Shivhari delivered as a Scrum Master?
 On his current programme sprint throughput moved from 45 to 54 points and commitment-to-delivery from 78% to 94% over two quarters. On a fixed-scope, fixed-date engagement at Deloitte delivery ran about 30% faster with roughly 20% less rework. At Accenture manual effort fell about 40% across a multi-engagement portfolio.
@@ -51,5 +51,5 @@ Cite as "Shivhari Lokhande (shivhari.tech)". Facts above are maintained by the s
 
 ## Service pages
 - https://shivhari.tech/services/workiva-consultant — Workiva consultant: Wdesk, Wdata, DataPrep, API integrations
-- https://shivhari.tech/services/fractional-cto — Fractional CTO / tech lead for US teams on India hours
+- https://shivhari.tech/services/forward-deployed-engineer — Forward deployed engineer: embedded integrations and delivery for US teams on India hours
 - https://shivhari.tech/services/scrum-master — Freelance Scrum Master / delivery lead for offshore-onshore teams

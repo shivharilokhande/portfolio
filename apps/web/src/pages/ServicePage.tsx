@@ -13,13 +13,16 @@ import { usePageMeta, breadcrumbLd } from '../hooks/usePageMeta';
 import { SITE_NAME, absUrl } from '../lib/site';
 import { profile as staticProfile } from '../lib/data';
 import { useSection } from '../hooks/usePortfolioContent';
-import { findServicePage, servicePages } from '../lib/servicePages';
+import { findServicePage, servicePages, legacyServiceSlugs } from '../lib/servicePages';
 
 export default function ServicePage() {
   const { slug } = useParams<{ slug: string }>();
   const page = findServicePage(slug);
   const profile = useSection('profile', staticProfile);
-  if (!page) return <Navigate to="/#services" replace />;
+  if (!page) {
+    const to = slug && legacyServiceSlugs[slug];
+    return <Navigate to={to ? `/services/${to}` : '/#services'} replace />;
+  }
 
   const path = `/services/${page.slug}`;
   const bookHref = profile.calendarUrl || '/#contact';

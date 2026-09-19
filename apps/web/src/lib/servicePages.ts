@@ -2,7 +2,7 @@
  * Service landing pages — one URL per thing a buyer actually searches for.
  *
  *   /services/workiva-consultant   "Workiva consultant", "Wdata integration", "Wdesk implementation partner"
- *   /services/fractional-cto       "fractional CTO India", "fractional tech lead for US startup"
+ *   /services/forward-deployed-engineer  "forward deployed engineer", "embedded delivery engineer", "FDE India US hours"
  *   /services/scrum-master         "freelance scrum master", "offshore scrum master US hours"
  *
  * Each page is a real, indexable document: H1 with the keyword, a plain
@@ -66,48 +66,49 @@ export const servicePages: ServicePage[] = [
     ],
     priceNote: 'Fixed-scope SOW or monthly retainer · NDA and clean IP on every engagement',
     serviceType: 'Financial reporting platform implementation',
-    related: ['fractional-cto', 'scrum-master'],
+    related: ['forward-deployed-engineer', 'scrum-master'],
   },
   {
-    slug: 'fractional-cto',
-    keyword: 'Fractional CTO',
-    title: 'Fractional CTO & Tech Lead for US Startups — India Hours | Shivhari Lokhande',
-    description: 'Part-time CTO / tech lead who owns architecture, delivery cadence and the engineering team for founders and finance teams in the US. Java, Spring Boot, AWS, agile delivery. Six years, IIT to EY.',
-    eyebrow: 'Fractional CTO · Tech Lead · Delivery',
-    h1: 'Fractional CTO who ships, not just advises',
-    answer: 'As a fractional CTO I take end-to-end ownership of a product engineering team a few days a week: architecture decisions, sprint cadence, hiring and coaching, and the roadmap conversation with founders and stakeholders. My background is hands-on — Java and Spring Boot microservices on AWS at Accenture, research engineering at IIT Bombay — and I currently run delivery for a 17-engineer programme for a US client.',
+    slug: 'forward-deployed-engineer',
+    keyword: 'Forward Deployed Engineer',
+    title: 'Forward Deployed Engineer — Embedded Delivery for US Finance & SaaS Teams | Shivhari Lokhande',
+    description: 'Forward deployed engineer who embeds with your customer or finance team, builds the integrations and workflows on their systems, and owns delivery to go-live. Java, Spring Boot, Workiva APIs, AWS. US hours from India.',
+    eyebrow: 'Forward Deployed Engineer · Embedded Delivery',
+    h1: 'Forward deployed engineer who sits with the customer and ships',
+    answer: 'A forward deployed engineer works inside the customer\u2019s environment rather than behind a product backlog: understanding their data and process, building the integrations, pipelines and workflows on their systems, and owning the outcome to go-live. That is the shape of my work today \u2014 a Workiva-integrated financial reporting programme for a US client, 17 engineers, US and India hours \u2014 and before it 50+ API integrations and 20+ Wdata chains delivered on-site with EY, Deloitte and Accenture clients.',
     outcomes: [
-      { stat: '17', label: 'engineers led across US and India hours' },
-      { stat: '78→94%', label: 'commitment-to-delivery in two quarters' },
-      { stat: '~30%', label: 'faster delivery on a fixed-date engagement' },
-      { stat: '6 yrs', label: 'IIT Bombay · Accenture · Deloitte · EY · CES' },
+      { stat: '17', label: 'engineers coordinated on an embedded client programme' },
+      { stat: '50+', label: 'customer-side API integrations shipped' },
+      { stat: '78\u219294%', label: 'commitment-to-delivery in two quarters' },
+      { stat: '6 yrs', label: 'IIT Bombay \u00b7 Accenture \u00b7 Deloitte \u00b7 EY \u00b7 CES' },
     ],
     deliverables: [
-      'Architecture and technical decisions, written down as ADRs your team can follow',
-      'Delivery cadence: sprint planning, reviews, retros, release management and a live RAID log',
-      'Hiring plan, interview loop and onboarding for the first engineers',
-      'Weekly founder/board-ready status: progress, risks, spend, next decisions',
-      'Vendor and platform choices (cloud, payments, analytics) with cost in view',
+      'Discovery inside the customer\u2019s systems: data sources, process owners, controls, what \u201cdone\u201d means to them',
+      'Integrations and workflows built on their stack \u2014 Java/Spring Boot services, REST APIs, Workiva, ERP and Salesforce connectors, AWS',
+      'A working increment every week the customer can see, with the RAID log and status pack their leadership reads',
+      'Feedback carried back to your product team as concrete tickets, not anecdotes',
+      'Go-live, hypercare and handover so the customer\u2019s team runs it without me',
     ],
     process: [
-      { step: 'Audit (week 1)', detail: 'Codebase, infra, team and backlog review; a one-page plan with the three things to fix first.' },
-      { step: 'Stabilise (month 1)', detail: 'Cadence, CI/CD, monitoring and a definition of done everyone can point at.' },
-      { step: 'Scale (months 2–6)', detail: 'Roadmap execution, hiring, architecture evolution, cost control.' },
-      { step: 'Hand over', detail: 'Coach an in-house lead or stay on a lighter retainer — your call.' },
+      { step: 'Embed (week 1)', detail: 'Access, people, data and the first three problems worth solving \u2014 written down and agreed with the customer.' },
+      { step: 'Build (weeks 2\u20138)', detail: 'Weekly increments on the customer\u2019s systems; demos to their stakeholders, not just yours.' },
+      { step: 'Go-live', detail: 'Parallel run or staged cutover, hypercare, runbooks.' },
+      { step: 'Scale or hand over', detail: 'Templatise what worked for the next customer, or hand to their team and step back.' },
     ],
     fit: [
-      'You are a non-technical founder or a finance leader who inherited an engineering team.',
-      'Releases slip, nobody can say why, and a full-time CTO is not in the budget yet.',
-      'You want US-hours coverage without US-hours cost.',
+      'You sell a platform (Workiva, a finance or data product) and enterprise customers need an engineer on their side to make it real.',
+      'Your US customers want someone in their meetings who can also write the code \u2014 without a US-hours price.',
+      'Implementation is slipping because product engineers are pulled into customer work they were not hired for.',
     ],
     faq: [
-      { q: 'How many days a week does a fractional CTO engagement take?', a: 'Typically 2–3 days a week for the first quarter, tapering to 1–2 once cadence and monitoring are in place. Everything is on a monthly retainer with a 30-day notice.' },
-      { q: 'Do you write code?', a: 'When it unblocks the team — proofs of concept, reviews, the occasional critical fix. The job is to make the team faster, not to be the bottleneck.' },
-      { q: 'What stacks do you know best?', a: 'Java and Spring Boot microservices, React and TypeScript front ends, PostgreSQL, AWS and Azure DevOps. I have also led Workiva and financial-reporting platforms end to end.' },
+      { q: 'What is a forward deployed engineer?', a: 'An engineer who works embedded with a customer to deploy, integrate and adapt a product to that customer\u2019s systems and processes, owning the outcome rather than a ticket queue. The role blends solutions engineering, integration development and delivery management.' },
+      { q: 'How is this different from a consultant or a fractional CTO?', a: 'A consultant advises; a forward deployed engineer builds and ships inside the customer environment, then feeds what they learn back to the product team. I still take the delivery-lead layer \u2014 cadence, RAID, status \u2014 because that is what keeps enterprise customers calm.' },
+      { q: 'Which stacks and platforms?', a: 'Java and Spring Boot services, REST APIs, PostgreSQL, AWS and Azure DevOps; Workiva (Wdesk, Wdata, DataPrep) and its APIs; ERP and Salesforce integrations. React and TypeScript when the customer needs a front end.' },
+      { q: 'Part-time or full-time, and on whose hours?', a: 'Both. Embedded engagements usually start full-time for the first customer, then taper. Overlap with US hours is agreed up front; my current programme runs across US and India time zones.' },
     ],
-    priceNote: 'Monthly retainer · 2–3 days/week to start · 30-day notice',
-    serviceType: 'Technical leadership',
-    related: ['scrum-master', 'workiva-consultant'],
+    priceNote: 'Per-customer engagement or monthly retainer \u00b7 30-day notice \u00b7 NDA and clean IP',
+    serviceType: 'Forward deployed engineering / embedded delivery',
+    related: ['workiva-consultant', 'scrum-master'],
   },
   {
     slug: 'scrum-master',
@@ -148,10 +149,13 @@ export const servicePages: ServicePage[] = [
     ],
     priceNote: 'Part-time or full-time · monthly retainer · 30-day notice',
     serviceType: 'Agile delivery',
-    related: ['fractional-cto', 'workiva-consultant'],
+    related: ['forward-deployed-engineer', 'workiva-consultant'],
   },
 ];
 
 export function findServicePage(slug: string | undefined): ServicePage | undefined {
   return servicePages.find((s) => s.slug === slug);
 }
+
+/** Old URLs that once existed → where they live now (ServicePage redirects). */
+export const legacyServiceSlugs: Record<string, string> = { 'fractional-cto': 'forward-deployed-engineer' };

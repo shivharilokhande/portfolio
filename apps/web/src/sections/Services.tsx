@@ -33,7 +33,7 @@ const accentRing: Record<Service['accent'], string> = {
 /** Service card → dedicated landing page (SEO). Keys match Service.name. */
 const pageFor: Record<string, string> = {
   'Workiva Expert': '/services/workiva-consultant',
-  'Tech Lead':      '/services/fractional-cto',
+  'Tech Lead':      '/services/forward-deployed-engineer',
   'Scrum Master':   '/services/scrum-master',
 };
 
@@ -156,10 +156,11 @@ export default function Services() {
                     {pageFor[s.name] && (
                       <Link
                         to={pageFor[s.name]}
-                        className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline min-h-[36px]"
-                        aria-label={`Read more about ${s.name} services`}
+                        className="mt-6 inline-flex w-full items-center justify-center gap-2 min-h-[44px] px-4 rounded-lg font-semibold text-sm transition ghost-line surface-low text-ink hover:bg-surface-container"
+                        style={{ borderColor: `${color}55` }}
+                        aria-label={`See how a ${s.name} engagement works`}
                       >
-                        How this engagement works →
+                        See how it works <span aria-hidden>→</span>
                       </Link>
                     )}
                   </div>
