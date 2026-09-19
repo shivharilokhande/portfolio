@@ -9,7 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   ShoppingBag, Check, FileDown, Tag, Sparkles, ArrowRight, ChevronRight,
 } from 'lucide-react';
-import { store, type ProductDto } from './storeApi';
+import { store, demoProduct, type ProductDto } from './storeApi';
 import { useCart, formatMoney } from './cartStore';
 import { onStoreChanged } from '../lib/portfolioBus';
 import { assetUrl } from '../lib/api';
@@ -75,29 +75,44 @@ const POLL_MS = 30_000;
 export default function ProductPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const [p, setP] = useState<ProductDto | null | undefined>(undefined);
+  // Optimistic first paint: if the slug is in the bundled catalog, render it
+  // immediately and swap in the API result when it arrives (the backend can
+  // cold-start for ~50 s). `source` tracks whether `p` is cached or live.
+  const [p, setP] = useState<ProductDto | null | undefined>(() => demoProduct(slug));
+  const [source, setSource] = useState<'cached' | 'live'>('cached');
+  const [pending, setPending] = useState(true);
   const currency = useCart((s) => s.currency);
   const add      = useCart((s) => s.add);
 
   const reqIdRef = useRef(0);
   const load = useCallback(async () => {
-    if (!slug) { setP(null); return; }
+    if (!slug) { setP(null); setPending(false); return; }
     const myId = ++reqIdRef.current;
+    setPending(true);
     try {
       const data = await store.one(slug);
       if (reqIdRef.current !== myId) return;
+      // `null` here is a real 404 from the server — keep the not-found behaviour.
       setP(data);
+      setSource('live');
     } catch (e) {
       if (reqIdRef.current !== myId) return;
-      // 429 / 5xx → don't leave the page stuck on the shimmer.
-      // Show the "Product not found" panel so the user can navigate away.
+      // 429 / 5xx / network → keep whatever is on screen (cached or live).
+      // Only fall through to "Product not found" when there is nothing to show.
       console.warn('ProductPage load failed', e);
-      setP(null);
+      setP((prev) => prev ?? demoProduct(slug) ?? null);
+    } finally {
+      if (reqIdRef.current === myId) setPending(false);
     }
   }, [slug]);
 
-  // Initial load + reload whenever the slug changes.
-  useEffect(() => { load(); }, [load]);
+  // Initial load + reload whenever the slug changes. Reset to the cached entry
+  // (or the skeleton) for the new slug first so a stale product never lingers.
+  useEffect(() => {
+    setP(demoProduct(slug));
+    setSource('cached');
+    load();
+  }, [slug, load]);
 
   // Instant push from admin save (same browser).
   useEffect(() => onStoreChanged(() => load()), [load]);
@@ -122,7 +137,14 @@ export default function ProductPage() {
   if (p === undefined) {
     return (
       <div className="max-w-content mx-auto px-4 sm:px-6">
-        <div className="h-80 shimmer rounded-3xl mt-6" />
+        <div
+          role="status"
+          aria-busy="true"
+          aria-live="polite"
+          className="h-80 shimmer rounded-3xl mt-6 grid place-items-center"
+        >
+          <span className="text-sm text-muted">Loading product…</span>
+        </div>
       </div>
     );
   }
@@ -219,6 +241,11 @@ export default function ProductPage() {
               </span>
               <span className="text-xs text-ink-soft">one-time · all updates included</span>
             </div>
+            {pending && source === 'cached' && (
+              <p className="mt-2 text-xs text-muted" role="status" aria-live="polite">
+                Live price loading…
+              </p>
+            )}
 
             <div className="mt-6 grid gap-3">
               <button onClick={buyNow} className="btn-primary w-full justify-center text-base py-3">

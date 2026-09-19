@@ -11,6 +11,7 @@ import { useCart } from './cartStore';
 import { useEffect, useState } from 'react';
 import Footer from '../sections/Footer';
 import BrandLogo from '../components/BrandLogo';
+import { warmApi } from '../lib/api';
 
 export default function StoreLayout() {
   const count = useCart((s) => s.itemCount());
@@ -18,6 +19,9 @@ export default function StoreLayout() {
   const setCurrency = useCart((s) => s.setCurrency);
   const [scrolled, setScrolled] = useState(false);
   const { pathname } = useLocation();
+
+  // Wake the (free-tier, sleepy) backend as soon as any /store route mounts.
+  useEffect(() => { warmApi(); }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);

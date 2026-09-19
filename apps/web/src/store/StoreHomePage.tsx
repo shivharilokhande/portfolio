@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ProductCard from './components/ProductCard';
-import { store, type ProductDto } from './storeApi';
+import { store, demoProducts, type ProductDto } from './storeApi';
 import { onStoreChanged } from '../lib/portfolioBus';
 import { usePageMeta, breadcrumbLd } from '../hooks/usePageMeta';
 import { SITE_OWNER, absUrl } from '../lib/site';
@@ -20,24 +20,29 @@ const HERO_COPY =
 const POLL_MS = 30_000;
 
 export default function StoreHomePage() {
-  const [items, setItems] = useState<ProductDto[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Optimistic first paint: render the bundled catalog instantly and swap in
+  // the API response when it arrives (the backend can cold-start for ~50 s).
+  const [items, setItems] = useState<ProductDto[]>(() => demoProducts());
+  const [source, setSource] = useState<'cached' | 'live'>('cached');
+  const [pending, setPending] = useState(true);
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>('All');
 
   const reqIdRef = useRef(0);
   const load = useCallback(async () => {
     const myId = ++reqIdRef.current;
+    setPending(true);
     try {
       const data = await store.list();
       if (reqIdRef.current !== myId) return;
       setItems(data);
+      setSource('live');
     } catch (e) {
-      // 429 / 5xx — keep whatever we already have on screen and just stop the shimmer.
+      // 429 / 5xx / network — keep whatever we already have on screen (cached or live).
       if (reqIdRef.current !== myId) return;
       console.warn('StoreHomePage load failed', e);
     } finally {
-      if (reqIdRef.current === myId) setLoading(false);
+      if (reqIdRef.current === myId) setPending(false);
     }
   }, []);
 
@@ -166,13 +171,12 @@ export default function StoreHomePage() {
 
       {/* Grid */}
       <section className="py-10">
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-80 rounded-3xl shimmer" />
-            ))}
-          </div>
-        ) : filtered.length === 0 ? (
+        {pending && source === 'cached' && (
+          <p className="mb-4 text-xs text-muted" role="status" aria-live="polite">
+            Live prices loading…
+          </p>
+        )}
+        {filtered.length === 0 ? (
           <div className="tier-3 ambient-float p-10 text-center text-ink-soft">
             No products match this filter yet.
           </div>

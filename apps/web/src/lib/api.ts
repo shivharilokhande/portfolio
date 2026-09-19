@@ -6,7 +6,7 @@
  *                    falling back to in-memory data via the catch path below)
  */
 
-const BASE = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
+export const BASE = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
 
 export type ApiError = {
   error: string;
@@ -69,3 +69,19 @@ export function assetUrl(u: string): string {
 
 /** Whether the env points at a real backend. Useful for graceful fallbacks. */
 export const apiConfigured = BASE.length > 0;
+
+/**
+ * Fire-and-forget API warm-up. The backend runs on a free tier that sleeps
+ * after inactivity and takes ~50 s to cold-start; pinging the (cheap, unauthenticated)
+ * actuator health endpoint as early as possible — on store-layout mount, or when
+ * the user merely hovers/focuses the Store link — shaves that off the first real
+ * request. Runs once per page load; every failure is swallowed.
+ */
+let warmed = false;
+export function warmApi(): void {
+  if (warmed) return;
+  warmed = true;
+  try {
+    fetch(`${BASE}/actuator/health`, { method: 'GET', keepalive: true }).catch(() => {});
+  } catch { /* fetch unavailable (SSR / very old browser) — ignore */ }
+}

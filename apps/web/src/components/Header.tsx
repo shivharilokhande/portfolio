@@ -4,7 +4,7 @@ import { Menu, X, ShoppingBag, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { profile as staticProfile } from '../lib/data';
 import { useSection } from '../hooks/usePortfolioContent';
-import { assetUrl } from '../lib/api';
+import { assetUrl, warmApi } from '../lib/api';
 import { useCart } from '../store/cartStore';
 import BrandLogo from './BrandLogo';
 
@@ -27,7 +27,14 @@ const links: NavLink[] = [
 function LinkItem({ l, onClick }: { l: NavLink; onClick?: () => void }) {
   const cls = 'px-3 py-2 rounded-lg text-ink-soft hover:text-ink hover:bg-surface-low/70 transition';
   if (l.href.startsWith('/') && !l.external) {
-    return <Link to={l.href} onClick={onClick} className={cls}>{l.label}</Link>;
+    // Hovering/focusing the Store link is a strong intent signal — start
+    // waking the backend before the click so the catalog loads live sooner.
+    const warm = l.id === 'store' ? warmApi : undefined;
+    return (
+      <Link to={l.href} onClick={onClick} onPointerEnter={warm} onFocus={warm} className={cls}>
+        {l.label}
+      </Link>
+    );
   }
   return <a href={l.href} onClick={onClick} className={cls}>{l.label}</a>;
 }
@@ -99,6 +106,8 @@ export default function Header() {
           <Link
             to="/store/cart"
             aria-label={`Cart, ${cartCount} items`}
+            onPointerEnter={warmApi}
+            onFocus={warmApi}
             className="relative p-2 rounded-lg ghost-line hover:bg-surface-low/70 transition"
           >
             <ShoppingBag size={16} />

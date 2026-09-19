@@ -248,6 +248,18 @@ const __demoCatalog: ProductDto[] = [
  */
 export const apiConfigured = BASE.length > 0;
 
+/**
+ * Bundled catalog for optimistic first paint. The API cold-starts for tens of
+ * seconds on its free tier; pages render this immediately and swap in live data
+ * when the request resolves, so a visitor never stares at a blank skeleton.
+ */
+export function demoProducts(): ProductDto[] {
+  return __demoCatalog;
+}
+export function demoProduct(slug: string | undefined): ProductDto | undefined {
+  return slug ? __demoCatalog.find((p) => p.slug === slug) : undefined;
+}
+
 /** True when the error looks like the backend simply isn't reachable — not
  *  when it responded with a 4xx/5xx status. We only fall back to the demo
  *  catalog for the former; real HTTP errors must surface to the caller. */
