@@ -215,6 +215,15 @@ body.menu-open{overflow:hidden}
 .uni-side{position:absolute;top:34%;font-family:"Cormorant Garamond",serif;letter-spacing:.3em;text-transform:uppercase;font-size:.7rem;color:var(--muted);line-height:2.2;z-index:3}
 .uni-side.l{left:0;text-align:left}.uni-side.r{right:0;text-align:right}
 @media (max-width:720px){.uni-side{display:none} .uni-field{height:560px} .tile{--w:74px!important} .uni-person{height:60%}}
+@media (max-width:600px){
+ .uni-field{height:auto;perspective:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:12px 0 32px;margin-top:8px}
+ .tile{position:relative;left:auto;top:auto;width:auto;--w:96px!important;transform:none!important;padding:10px}
+ .tile .inner{animation:none}
+ .uni-person{display:none!important}
+ .skip-intro{right:50%;bottom:10px;transform:translateX(50%)}
+ .hero-stage{padding-bottom:52px}
+ .subline{gap:6px 18px;font-size:.7rem}
+}
 
 /* TIMELINE */
 #journey{position:relative;height:420vh;padding:0;background:
@@ -304,8 +313,8 @@ body.menu-open{overflow:hidden}
 @keyframes sweep{0%{transform:translateY(-220px) scaleX(.2)}50%{transform:translateY(220px) scaleX(1)}100%{transform:translateY(-220px) scaleX(.2)}}
 .work-head{text-align:center;position:relative;z-index:2}
 .stage{position:relative;max-width:1300px;margin:50px auto 0;display:grid;grid-template-columns:1fr minmax(180px,260px) 1fr;gap:24px;align-items:center;z-index:2}
-.stage .center{position:relative;height:380px;display:grid;place-items:end center}
-.stage .center img{height:92%;filter:brightness(.1) contrast(1.2) drop-shadow(0 0 30px rgba(200,16,46,.35));position:relative;z-index:2}
+.stage .center{position:relative;height:380px;display:flex;align-items:flex-end;justify-content:center}
+.stage .center img{height:92%;max-height:92%;width:auto;filter:brightness(.1) contrast(1.2) drop-shadow(0 0 30px rgba(200,16,46,.35));position:relative;z-index:2}
 .stage .center::before{content:"";position:absolute;left:50%;bottom:-30px;width:520px;height:160px;transform:translateX(-50%);
  background:repeating-radial-gradient(ellipse at 50% 50%,transparent 0 30px,rgba(200,16,46,.28) 30px 31px,transparent 31px 60px);opacity:.8;mask:radial-gradient(ellipse at 50% 50%,#000,transparent 75%);animation:ringPulse 3s ease-in-out infinite}
 .stage .center::after{content:"";position:absolute;left:50%;bottom:-24px;width:360px;height:70px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse,rgba(200,16,46,.5),transparent 70%);filter:blur(10px)}
