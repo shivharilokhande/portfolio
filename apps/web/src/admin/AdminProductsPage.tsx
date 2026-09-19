@@ -197,6 +197,7 @@ export default function AdminProductsPage() {
               <Link
                 to={`/store/${p.slug}`}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="p-2 rounded-lg surface-low ghost-line text-ink-soft hover:bg-surface-container transition"
                 title="Open in store"
                 aria-label="Open in store"

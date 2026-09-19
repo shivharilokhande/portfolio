@@ -26,7 +26,7 @@ export const profile = {
   location: 'Pune, India · Remote-first',
   email: 'shivlokhande7080@gmail.com',
   phone: '+91 95189 56711',
-  cvUrl: '/Shivhari-Lokhande-CV.pdf',
+  cvUrl: '',
   // Optional scheduling link (Calendly, cal.com, …). When set, the hero's
   // primary CTA books directly instead of scrolling to #contact.
   calendarUrl: undefined as string | undefined,

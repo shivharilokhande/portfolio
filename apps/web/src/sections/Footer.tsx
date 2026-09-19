@@ -53,11 +53,11 @@ export default function Footer() {
                 {footerCopy.creditsBody}
               </p>
               <div className="mt-6 flex flex-wrap gap-2">
-                <a href={profile.socials.linkedin} target="_blank" rel="noreferrer"
+                <a href={profile.socials.linkedin} target="_blank" rel="noopener noreferrer"
                    className="chip-resource hover:bg-surface-container transition">
                   <Linkedin size={12} /> LinkedIn
                 </a>
-                <a href={profile.socials.github} target="_blank" rel="noreferrer"
+                <a href={profile.socials.github} target="_blank" rel="noopener noreferrer"
                    className="chip-resource hover:bg-surface-container transition">
                   <Github size={12} /> GitHub
                 </a>

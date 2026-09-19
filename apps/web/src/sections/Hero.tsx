@@ -145,7 +145,7 @@ export default function Hero() {
                 transition={{ duration: 0.5, ease: easeOut }}
                 href={primaryHref}
                 target={primaryExternal ? '_blank' : undefined}
-                rel={primaryExternal ? 'noreferrer' : undefined}
+                rel={primaryExternal ? 'noopener noreferrer' : undefined}
                 className="btn-primary"
               >
                 {primaryLabel}
@@ -173,7 +173,7 @@ export default function Hero() {
                   href={assetUrl(profile.cvUrl)}
                   download={cvDownloadName(profile)}
                   target={profile.cvUrl.startsWith('http') ? '_blank' : undefined}
-                  rel={profile.cvUrl.startsWith('http') ? 'noreferrer' : undefined}
+                  rel={profile.cvUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
                   className="inline-flex items-center gap-2 px-5 py-3 rounded-lg surface-low ghost-line text-ink font-semibold text-sm hover:bg-surface-container transition"
                 >
                   <Download size={16} /> Download CV

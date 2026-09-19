@@ -137,7 +137,7 @@ export default function Header() {
               href={assetUrl(profile.cvUrl)}
               download={cvDownloadName(profile)}
               target={profile.cvUrl.startsWith('http') ? '_blank' : undefined}
-              rel={profile.cvUrl.startsWith('http') ? 'noreferrer' : undefined}
+              rel={profile.cvUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
               className="hidden sm:inline-flex items-center gap-1 min-h-[44px] px-3 py-2 rounded-lg text-sm font-medium ghost-line hover:bg-surface-low/70 transition"
             >
               CV
@@ -179,7 +179,7 @@ export default function Header() {
                   href={assetUrl(profile.cvUrl)}
                   download={cvDownloadName(profile)}
                   target={profile.cvUrl.startsWith('http') ? '_blank' : undefined}
-                  rel={profile.cvUrl.startsWith('http') ? 'noreferrer' : undefined}
+                  rel={profile.cvUrl.startsWith('http') ? 'noopener noreferrer' : undefined}
                   onClick={() => setOpen(false)}
                   className="inline-flex items-center min-h-[44px] px-4 rounded-lg text-sm font-medium ghost-line hover:bg-surface-low/70 transition"
                 >

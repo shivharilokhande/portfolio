@@ -124,7 +124,7 @@ export default function Contact() {
             {profile.socials.linkedin && (
               <li className="flex items-center gap-3">
                 <span className="w-10 h-10 shrink-0 rounded-xl surface-low grid place-items-center ambient-float text-primary"><Linkedin size={16} /></span>
-                <a href={profile.socials.linkedin} target="_blank" rel="noreferrer" className="hover:text-primary text-ink break-anywhere min-w-0">
+                <a href={profile.socials.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-primary text-ink break-anywhere min-w-0">
                   {/* Display text derived from the URL — strips protocol +
                       trailing slash — so a buyer of the template doesn't
                       see the previous owner's handle. */}
@@ -135,7 +135,7 @@ export default function Contact() {
             {profile.socials.github && (
               <li className="flex items-center gap-3">
                 <span className="w-10 h-10 shrink-0 rounded-xl surface-low grid place-items-center ambient-float text-primary"><Github size={16} /></span>
-                <a href={profile.socials.github} target="_blank" rel="noreferrer" className="hover:text-primary text-ink break-anywhere min-w-0">
+                <a href={profile.socials.github} target="_blank" rel="noopener noreferrer" className="hover:text-primary text-ink break-anywhere min-w-0">
                   {displayFromUrl(profile.socials.github)}
                 </a>
               </li>

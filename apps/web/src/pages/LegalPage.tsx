@@ -148,7 +148,7 @@ function LegalNavLink({ to, label, active }: { to: string; label: string; active
  *   ### sub-heading     → <h3>
  *   - bullet            → <ul><li>…</li></ul>
  *   **bold**            → <strong>…</strong>
- *   [text](url)         → <a href="url" rel="noreferrer noopener">…</a>
+ *   [text](url)         → <a href="url" rel="noopener noreferrer">…</a>
  *   blank line          → new paragraph
  *
  * Every other character is HTML-escaped first, so the input can't inject
@@ -170,7 +170,7 @@ function renderMiniMarkdown(src: string): string {
       // Only allow http(s), mailto, and same-origin absolute paths.
       const safeUrl = /^(https?:\/\/|mailto:|\/)/.test(url) ? url : '#';
       const external = /^https?:/.test(safeUrl);
-      const attrs = external ? ' target="_blank" rel="noreferrer noopener"' : '';
+      const attrs = external ? ' target="_blank" rel="noopener noreferrer"' : '';
       return `<a href="${safeUrl}"${attrs}>${text}</a>`;
     });
 
