@@ -1,7 +1,6 @@
 # Cloudflare Pages routing.
 # Static files (portfolio/, og.jpg, llms.txt, robots.txt, sitemap.xml, assets/) are served first.
-# Everything else falls back to the SPA shell; unknown routes render NotFoundPage (noindex).
-# NOTE: Pages does NOT support per-route "/index.html 200" rewrites (it 308s to "/"), so the
-# splat fallback below is the only working SPA pattern here.
+# Do NOT add a 404.html: its presence switches Pages out of automatic SPA mode, and Pages
+# ignores "/* /index.html 200" proxy rules, so every deep route (/store/*, /legal/*, /admin/*)
+# would 404. Unknown routes are handled in-app by NotFoundPage (robots noindex).
 /portfolio      /portfolio/index.html   200
-/*              /index.html             200
