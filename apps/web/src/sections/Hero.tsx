@@ -15,7 +15,7 @@ import { copyDefaults, mergeCopy } from '../lib/copyDefaults';
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
 const FALLBACK_HEADLINE =
-  'Forward Deployed Engineer & Workiva delivery lead for US finance teams — on India hours.'.split(' ');
+  'Forward Deployed Engineer, Scrum Master & Workiva delivery lead.'.split(' ');
 const FALLBACK_SUB =
   'Six years across IIT Bombay, Accenture, Deloitte, EY and CES. Sprint commitment 78→94%, 50+ Workiva API integrations, 17 engineers led across two time zones.';
 

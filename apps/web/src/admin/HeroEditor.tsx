@@ -22,7 +22,7 @@ type HeroDoc = {
 };
 
 const DEFAULT: HeroDoc = {
-  headline:     'Forward Deployed Engineer & Workiva delivery lead for US finance teams — on India hours.'.split(' '),
+  headline:     'Forward Deployed Engineer, Scrum Master & Workiva delivery lead.'.split(' '),
   badge:        'Available for forward-deployed & Workiva engagements',
   primaryCta:   { label: 'Book a free 30-min discovery call', href: '/#contact' },
   secondaryCta: { label: 'See the work',                      href: '/portfolio/' },

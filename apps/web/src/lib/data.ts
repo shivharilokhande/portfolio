@@ -19,7 +19,7 @@ export const profile = {
   name: 'Shivhari Lokhande',
   shortName: 'Shivhari',
   fullName: 'Shivhari Ananta Lokhande',
-  title: 'Forward Deployed Engineer · Scrum Master · Workiva Specialist',
+  title: 'Forward Deployed Engineer · Scrum Master · Workiva Delivery Lead',
   tagline: 'Engineering + Agile, side by side.',
   oneLiner:
     "I'm Shivhari Lokhande — technical lead, scrum master, backend engineer. Six years building software — R&D at IIT Bombay since 2020, then enterprise platforms at Accenture, Deloitte, EY and CES. This site is a small demo of the kind of work I do — and the bar I hold it to.",
