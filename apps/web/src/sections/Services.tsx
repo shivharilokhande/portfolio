@@ -33,13 +33,15 @@ const accentRing: Record<Service['accent'], string> = {
 /** Service card → dedicated landing page (SEO). Keys match Service.name. */
 const pageFor: Record<string, string> = {
   'Workiva Expert': '/services/workiva-consultant',
-  'Tech Lead':      '/services/forward-deployed-engineer',
+  'Tech Lead':                 '/services/forward-deployed-engineer',
+  'Forward Deployed Engineer': '/services/forward-deployed-engineer',
   'Scrum Master':   '/services/scrum-master',
 };
 
 const iconFor: Record<string, React.ReactNode> = {
   'Workiva Expert':    <Layers size={16} />,
-  'Tech Lead':         <Briefcase size={16} />,
+  'Tech Lead':                 <Briefcase size={16} />,
+  'Forward Deployed Engineer': <Briefcase size={16} />,
   'Scrum Master':      <Compass size={16} />,
   'Backend Developer': <Code2 size={16} />,
 };
