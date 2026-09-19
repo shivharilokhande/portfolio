@@ -6,11 +6,14 @@ import { useEffect, useState } from 'react';
  * Sits on the light surface, lifts a tier-3 white card with ambient float,
  * and uses the primary green gradient for the progress bar.
  */
+/** Hard cap on how long the boot screen may gate first paint. */
+export const BOOT_MAX_MS = 800;
+
 export default function LoadingScreen({
   progress,
   label = 'Preparing the experience',
   done,
-  delayMs = 240,
+  delayMs = 120,
 }: {
   progress: number;
   label?:    string;
@@ -25,6 +28,12 @@ export default function LoadingScreen({
       return () => clearTimeout(id);
     }
   }, [done, progress, delayMs]);
+
+  // Safety net: whatever the parent reports, never stay up past BOOT_MAX_MS.
+  useEffect(() => {
+    const id = setTimeout(() => setVisible(false), BOOT_MAX_MS);
+    return () => clearTimeout(id);
+  }, []);
 
   return (
     <AnimatePresence>

@@ -4,7 +4,7 @@
  *   Tonal layering (no borders), Space Grotesk numerals, primary green
  *   gradient accents per pillar, asymmetric stat strip + radar pairing.
  */
-import { lazy, Suspense, useMemo } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { motion } from 'framer-motion';
 import { Cpu, Layers, Trophy, Activity } from 'lucide-react';
 import SectionHeader from '../components/SectionHeader';
@@ -48,6 +48,24 @@ function SkillsCSSFallback({ categories }: { categories: SkillCategories }) {
   );
 }
 
+/** True once `ref` has come within `rootMargin` of the viewport (sticky).
+ *  Used to defer the three.js bundle until the cluster is about to show. */
+function useNearViewport<T extends Element>(ref: RefObject<T>, rootMargin = '400px'): boolean {
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || near) return;
+    if (typeof IntersectionObserver === 'undefined') { setNear(true); return; }
+    const io = new IntersectionObserver(
+      (entries) => { if (entries.some((e) => e.isIntersecting)) { setNear(true); io.disconnect(); } },
+      { rootMargin },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref, near, rootMargin]);
+  return near;
+}
+
 const avg = (a: { level: number }[]) => Math.round(a.reduce((s, x) => s + x.level, 0) / Math.max(1, a.length));
 const peak = (a: { level: number }[]) => (a.length ? Math.max(...a.map((x) => x.level)) : 0);
 
@@ -62,6 +80,8 @@ function SkillsHeader() {
 export default function Skills() {
   const skillCategories = useSection<typeof staticSkillCategories>('skills', staticSkillCategories);
   const webglOk = useMemo(detectWebGL, []);
+  const clusterRef = useRef<HTMLDivElement>(null);
+  const clusterNear = useNearViewport(clusterRef);
 
   const allSkills = useMemo(() => skillCategories.flatMap((c) => c.skills), [skillCategories]);
   const totalSkills = allSkills.length;
@@ -148,10 +168,10 @@ export default function Skills() {
 
             {/* Canvas fill — absolute inset-0 so the R3F canvas always matches
                 the parent regardless of sibling layout. */}
-            <div className="absolute inset-0">
-              {webglOk ? (
+            <div ref={clusterRef} className="absolute inset-0">
+              {webglOk && clusterNear ? (
                 <SafeCanvas fallback={<SkillsCSSFallback categories={skillCategories} />}>
-                  <Suspense fallback={<div className="absolute inset-0 grid place-items-center text-muted text-sm">Spinning up the cluster…</div>}>
+                  <Suspense fallback={<SkillsCSSFallback categories={skillCategories} />}>
                     <SkillsCanvas categories={skillCategories} />
                   </Suspense>
                 </SafeCanvas>

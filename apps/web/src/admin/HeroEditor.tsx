@@ -22,10 +22,10 @@ type HeroDoc = {
 };
 
 const DEFAULT: HeroDoc = {
-  headline:     ['Build', 'the', 'work', 'that', 'gets', 'remembered.'],
+  headline:     'Fractional CTO & Workiva delivery lead for US finance teams — on India hours.'.split(' '),
   badge:        'Available for freelance & fractional CTO engagements',
-  primaryCta:   { label: 'Start a conversation', href: '#contact' },
-  secondaryCta: { label: 'Download CV',           href: '/Shivhari-Lokhande-CV.pdf' },
+  primaryCta:   { label: 'Book a free 30-min discovery call', href: '/#contact' },
+  secondaryCta: { label: 'See the work',                      href: '/portfolio/' },
 };
 
 const easeOut = [0.16, 1, 0.3, 1] as const;

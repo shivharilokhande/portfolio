@@ -4,7 +4,6 @@
  *   Light tonal cards, primary product chips, no 1px borders.
  *   Marquee pauses on hover for accessibility.
  */
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Quote, Star, ShoppingBag, ArrowRight } from 'lucide-react';
 import SectionHeader from '../components/SectionHeader';
@@ -32,14 +31,17 @@ export default function Testimonials() {
         <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-bg to-transparent z-10 pointer-events-none" />
         <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-bg to-transparent z-10 pointer-events-none" />
 
-        <motion.div
-          className="flex gap-6 w-max group-hover:[animation-play-state:paused]"
-          animate={{ x: ['0%', '-50%'] }}
-          transition={{ duration: 50, ease: 'linear', repeat: Infinity }}
+        {/* CSS keyframe marquee on a duplicated track: hover really pauses
+            (play-state is CSS-owned), and prefers-reduced-motion falls back
+            to a static wrapping grid — see .marquee-track in index.css. */}
+        <div
+          className="marquee-track flex gap-6 w-max group-hover:[animation-play-state:paused]"
+          style={{ ['--marquee-duration' as string]: '50s' }}
         >
           {items.map((t, i) => (
             <article
               key={i}
+              aria-hidden={i >= testimonials.length || undefined}
               className={`w-[320px] sm:w-[440px] shrink-0 ambient-float p-7 relative overflow-hidden ${
                 i % 2 === 0 ? 'tier-3' : 'tier-1'
               }`}
@@ -73,7 +75,7 @@ export default function Testimonials() {
               </footer>
             </article>
           ))}
-        </motion.div>
+        </div>
       </div>
 
       <div className="mt-12 max-w-content mx-auto px-4 sm:px-6 text-center">

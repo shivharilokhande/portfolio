@@ -79,7 +79,7 @@ body {
 /* Editorial display — pulls extreme contrast against body */
 .font-display { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; }
 .font-num     { font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif; font-feature-settings: 'tnum' 1; }
-.font-mono    { font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace; }
+.font-mono    { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 
 .text-gradient {
   background: linear-gradient(120deg, rgb(var(--primary)), rgb(var(--primary-soft)) 80%);
@@ -195,6 +195,15 @@ body {
   font-size: 0.75rem;
   font-weight: 500;
   box-shadow: 0 0 0 1px rgb(var(--outline-variant) / 0.18);
+}
+/* Hero availability badge — same chip, stepped up so the offer reads first */
+.chip-resource-lg {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: rgb(var(--ink));
+  background: rgb(var(--surface-lowest));
+  box-shadow: 0 0 0 1px rgb(var(--primary-soft) / 0.35), 0 8px 24px -12px rgb(var(--primary) / 0.35);
 }
 .chip-status-active {
   display: inline-flex; align-items: center; gap: 0.4rem;
@@ -313,6 +322,27 @@ body {
 .canvas-host { position: absolute; inset: 0; z-index: 0; }
 
 /* floating skill dots (Skills.tsx CSS fallback) */
+/* Testimonials marquee — duplicated track, translate by half its width */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee var(--marquee-duration, 50s) linear infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0 1rem;
+  }
+  /* the duplicated half is only there to make the loop seamless */
+  .marquee-track > [aria-hidden="true"] { display: none; }
+}
+
 @keyframes float {
   0%, 100% { transform: translate(-50%, -50%) translateY(0); }
   50%      { transform: translate(-50%, -50%) translateY(-8px); }

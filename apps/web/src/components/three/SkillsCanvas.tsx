@@ -281,7 +281,16 @@ function Cluster({ categories }: { categories: SkillCategory[] }) {
 export default function SkillsCanvas({ categories = defaultSkillCategories }: { categories?: SkillCategory[] }) {
   useScrollVelocity();
   return (
+    <>
+      {/* Screen-reader equivalent of the WebGL cluster — the canvas itself
+          exposes nothing to assistive tech. */}
+      <ul className="sr-only" aria-label="Skills shown in the 3D cluster">
+        {categories.flatMap((c) => c.skills.map((s) => (
+          <li key={`${c.label}-${s.name}`}>{s.name} — {c.label}, {s.level}%</li>
+        )))}
+      </ul>
     <Canvas
+      aria-hidden
       dpr={[1, 1.8]}
       camera={{ position: [0, 0, 7], fov: 50 }}
       gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
@@ -304,5 +313,6 @@ export default function SkillsCanvas({ categories = defaultSkillCategories }: { 
 
       <OrbitControls enableZoom={false} enablePan={false} autoRotate={false} />
     </Canvas>
+    </>
   );
 }

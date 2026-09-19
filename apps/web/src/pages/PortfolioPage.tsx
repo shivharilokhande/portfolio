@@ -11,7 +11,7 @@ import { Suspense, lazy, useEffect, useState } from 'react';
 import Header from '../components/Header';
 import ScrollProgress from '../components/ScrollProgress';
 import ScrollAurora from '../components/ScrollAurora';
-import LoadingScreen from '../components/LoadingScreen';
+import LoadingScreen, { BOOT_MAX_MS } from '../components/LoadingScreen';
 import Hero from '../sections/Hero';
 import About from '../sections/About';
 import Timeline from '../sections/Timeline';
@@ -31,17 +31,31 @@ export default function PortfolioPage() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Quick boot — light editorial doesn't need to pre-buffer frames.
-    let frame = 0;
-    const id = window.setInterval(() => {
-      frame += 1;
-      setProgress(Math.min(100, frame * 22));
-      if (frame >= 5) {
-        setBooted(true);
-        window.clearInterval(id);
-      }
-    }, 80);
-    return () => window.clearInterval(id);
+    // Single gate: the display fonts. Resolve on `document.fonts.ready` or
+    // BOOT_MAX_MS, whichever comes first — the loader only exists to stop a
+    // fallback-font flash on the hero, nothing else is awaited.
+    let cancelled = false;
+    const finish = () => {
+      if (cancelled) return;
+      cancelled = true;
+      setProgress(100);
+      setBooted(true);
+    };
+    const start = performance.now();
+    const tick = window.setInterval(() => {
+      setProgress(Math.min(90, ((performance.now() - start) / BOOT_MAX_MS) * 100));
+    }, 60);
+    const cap = window.setTimeout(finish, BOOT_MAX_MS);
+    const fontsReady: Promise<unknown> =
+      typeof document !== 'undefined' && 'fonts' in document
+        ? document.fonts.ready
+        : Promise.resolve();
+    fontsReady.then(finish, finish);
+    return () => {
+      cancelled = true;
+      window.clearInterval(tick);
+      window.clearTimeout(cap);
+    };
   }, []);
 
   return (

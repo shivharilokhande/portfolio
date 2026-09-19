@@ -14,10 +14,28 @@ import { assetUrl } from '../lib/api';
 import { copyDefaults, mergeCopy } from '../lib/copyDefaults';
 
 const easeOut = [0.22, 1, 0.36, 1] as const;
-const FALLBACK_HEADLINE = ['Build', 'the', 'work', 'that', 'gets', 'remembered.'];
-const FALLBACK_HERO = {
-  headline: FALLBACK_HEADLINE,
-  badge:    'Available for freelance & fractional CTO engagements',
+const FALLBACK_HEADLINE =
+  'Fractional CTO & Workiva delivery lead for US finance teams — on India hours.'.split(' ');
+const FALLBACK_SUB =
+  'Six years across IIT Bombay, Accenture, Deloitte, EY and CES. Sprint commitment 78→94%, 50+ Workiva API integrations, 17 engineers led across two time zones.';
+
+type HeroDoc = {
+  headline?:     string[];
+  sub?:          string;
+  badge?:        string;
+  primaryCta?:   { label?: string; href?: string };
+  secondaryCta?: { label?: string; href?: string };
+};
+
+const FALLBACK_HERO: Required<Omit<HeroDoc, 'primaryCta' | 'secondaryCta'>> & {
+  primaryCta:   { label: string; href: string };
+  secondaryCta: { label: string; href: string };
+} = {
+  headline:     FALLBACK_HEADLINE,
+  sub:          FALLBACK_SUB,
+  badge:        'Available for freelance & fractional CTO engagements',
+  primaryCta:   { label: 'Book a free 30-min discovery call', href: '/#contact' },
+  secondaryCta: { label: 'See the work',                      href: '/portfolio/' },
 };
 
 /** Whether profile.cvUrl should render as a working download link. */
@@ -38,9 +56,20 @@ function cvDownloadName(p: { shortName?: string; name?: string }): string {
 
 export default function Hero() {
   const profile = useSection<typeof staticProfile>('profile', staticProfile);
-  const hero    = useSection<{ headline?: string[]; badge?: string }>('hero', FALLBACK_HERO);
-  const headlineWords = hero.headline ?? FALLBACK_HEADLINE;
-  const badgeText     = hero.badge    ?? FALLBACK_HERO.badge;
+  const hero    = useSection<HeroDoc>('hero', FALLBACK_HERO);
+  const headlineWords = hero.headline?.length ? hero.headline : FALLBACK_HEADLINE;
+  const subText       = hero.sub   ?? FALLBACK_SUB;
+  const badgeText     = hero.badge ?? FALLBACK_HERO.badge;
+  // CTAs: CMS hero doc wins; otherwise the primary CTA books via
+  // profile.calendarUrl when set, else scrolls to the contact form.
+  const primaryLabel = hero.primaryCta?.label || FALLBACK_HERO.primaryCta.label;
+  const primaryHref  = hero.primaryCta?.href  || profile.calendarUrl || FALLBACK_HERO.primaryCta.href;
+  const primaryExternal = /^https?:\/\//.test(primaryHref);
+  const secondaryLabel = hero.secondaryCta?.label || FALLBACK_HERO.secondaryCta.label;
+  const secondaryHref  = hero.secondaryCta?.href  || FALLBACK_HERO.secondaryCta.href;
+  // Long, offer-style headlines drop one display step so they still fit
+  // on three lines at desktop widths.
+  const headlineSize = headlineWords.length > 7 ? 'text-display-md' : 'text-display-lg';
   // Right-side "SHIPPING · NOW" card copy — every string, the stats, and
   // the chip row all come from the CMS 'copy' section now. Edit under
   // /admin/portfolio → Site copy → Hero card.
@@ -68,13 +97,13 @@ export default function Hero() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: easeOut }}
-              className="chip-resource"
+              className="chip-resource chip-resource-lg"
             >
               <span className="dot-live" />
               {badgeText}
             </motion.span>
 
-            <h1 className="mt-7 font-display text-display-lg max-w-5xl text-ink">
+            <h1 className={`mt-7 font-display ${headlineSize} max-w-5xl text-ink`}>
               {headlineWords.map((w, i) => (
                 <span key={i} className="inline-block overflow-hidden align-bottom mr-3 pb-1">
                   <motion.span
@@ -99,10 +128,9 @@ export default function Hero() {
               transition={{ duration: 0.55, ease: easeOut, delay: 0.85 }}
               className="mt-7 max-w-2xl text-base sm:text-lg text-ink-soft leading-relaxed"
             >
-              {/* Bio paragraph — pulled from the Profile CMS `oneLiner` field
-                  in full. Edit it under /admin/portfolio → Profile & Identity
-                  → One-liner (paragraph). */}
-              {profile.oneLiner}
+              {/* Offer sub-line — `hero.sub` from the CMS hero doc when set,
+                  otherwise the proof-point default above. */}
+              {subText}
             </motion.p>
 
             <motion.div
@@ -115,11 +143,23 @@ export default function Hero() {
               <motion.a
                 variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
                 transition={{ duration: 0.5, ease: easeOut }}
-                href="/#contact"
+                href={primaryHref}
+                target={primaryExternal ? '_blank' : undefined}
+                rel={primaryExternal ? 'noreferrer' : undefined}
                 className="btn-primary"
               >
-                Start a conversation
+                {primaryLabel}
                 <ArrowRight size={16} />
+              </motion.a>
+              {/* Plain anchor on purpose: /portfolio/ is a separate static
+                  page outside the SPA router. */}
+              <motion.a
+                variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}
+                transition={{ duration: 0.5, ease: easeOut }}
+                href={secondaryHref}
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-lg surface-low ghost-line text-ink font-semibold text-sm hover:bg-surface-container transition"
+              >
+                {secondaryLabel} <ArrowRight size={16} aria-hidden />
               </motion.a>
               {/* Render when the admin has either uploaded a PDF or set
                   cvUrl to any absolute URL. Empty / the stale seed default
