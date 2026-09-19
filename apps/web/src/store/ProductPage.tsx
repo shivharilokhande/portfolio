@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  ShoppingBag, Check, FileDown, Tag, Sparkles, ArrowRight, ChevronRight,
+  ShoppingBag, Check, FileDown, Tag, Sparkles, ArrowRight, ChevronRight, ExternalLink, Github,
 } from 'lucide-react';
 import { store, demoProduct, type ProductDto } from './storeApi';
 import { useCart, formatMoney } from './cartStore';
@@ -258,13 +258,37 @@ export default function ProductPage() {
               >
                 <ShoppingBag size={16} /> Add to cart
               </button>
+              {(p.demoUrl || p.repoUrl) && (
+                <div className="grid grid-cols-2 gap-3">
+                  {p.demoUrl && (
+                    <a
+                      href={p.demoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg ghost-line text-sm text-ink-soft hover:text-ink hover:bg-surface-low transition"
+                    >
+                      <ExternalLink size={14} /> Live demo
+                    </a>
+                  )}
+                  {p.repoUrl && (
+                    <a
+                      href={p.repoUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg ghost-line text-sm text-ink-soft hover:text-ink hover:bg-surface-low transition"
+                    >
+                      <Github size={14} /> Source
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
 
             <ul className="mt-6 space-y-2.5 text-xs text-ink-soft">
               <li className="flex items-center gap-2"><Check size={12} className="text-primary" /> Instant download after payment</li>
               <li className="flex items-center gap-2"><Check size={12} className="text-primary" /> Razorpay (UPI/cards) + Stripe accepted</li>
               <li className="flex items-center gap-2"><Check size={12} className="text-primary" /> Magic-link access — bookmark-friendly</li>
-              <li className="flex items-center gap-2"><Check size={12} className="text-primary" /> {p.fileSizeMb} MB · v{p.version} · MIT-license-ready</li>
+              <li className="flex items-center gap-2"><Check size={12} className="text-primary" /> {p.fileSizeMb} MB · v{p.version} · commercial licence included</li>
             </ul>
           </div>
         </aside>
